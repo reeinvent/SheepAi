@@ -1,0 +1,15 @@
+---
+description: Team workflow — GitHub Issues, gh CLI, PRs closing issues (see AGENTS.md)
+alwaysApply: true
+---
+
+# SheepAi workflow
+
+Follow the repo root **`AGENTS.md`** for coordination and implementation:
+
+- Use **GitHub Issues** for who does what; avoid duplicate ownership.
+- Use **`gh`** (`gh issue list`, `gh issue view`, `gh issue create`) after `gh auth login`.
+- Branch from **`develop`** if it exists, else **`main`**.
+- In PR descriptions, use **`Closes #<n>`** or **`Fixes #<n>`** so merging closes the issue.
+
+If instructions conflict, **`AGENTS.md` is canonical** for this project.

@@ -1,0 +1,5 @@
+# SheepAi (Windsurf / Cascade)
+
+Read and follow the repository root **AGENTS.md** for team coordination: GitHub Issues, GitHub CLI (`gh`), branching from `develop` when present else `main`, and pull request descriptions that include `Closes #<n>` or `Fixes #<n>` so issues close on merge.
+
+AGENTS.md is the single source of truth; this file only points Cascade at it.
