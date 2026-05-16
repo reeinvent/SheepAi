@@ -1,13 +1,34 @@
 import { Ingestor, type RawBatch } from "../ingestor";
-import type { XPost } from "./xIngestor";
 
-// Mock stand-in for the real X v2 ingestor. Emits items in the same parsed
-// `XPost` shape `xIngestor.ts` produces today, so the LLM stage and
-// downstream consumers can be exercised end-to-end without an X API key.
-// IDs, timestamps, and URLs are shaped to mirror what the live X v2 API
-// returns (numeric Snowflake-style tweet ids, numeric user ids, second-
-// precision ISO timestamps), so swapping to the real fetcher is a no-op
-// for everything downstream of this file.
+// Mock stand-in for a real X v2 ingestor. Emits items in a parsed `XPost`
+// shape that mirrors the live X v2 API response (numeric Snowflake-style
+// tweet ids, numeric user ids, second-precision ISO timestamps), so the
+// LLM stage and downstream consumers can be exercised end-to-end without
+// an X API key. A future real X ingestor should produce the same `XPost`
+// shape so swapping it in is a no-op for everything downstream.
+
+// The shape staged into `data/raw/x/...` for each post. Kept here because
+// `MockXIngestor` is the only producer today; move to a shared file once
+// a second producer appears.
+export interface XPost {
+  id: string;
+  text: string;
+  authorId: string;
+  authorUsername?: string;
+  authorName?: string;
+  createdAt: string;
+  lang?: string;
+  metrics?: {
+    retweet_count: number;
+    reply_count: number;
+    like_count: number;
+    quote_count: number;
+    impression_count?: number;
+  };
+  hashtags: string[];
+  mentions: string[];
+  urls: string[];
+}
 //
 // Two flavours of post are mixed in:
 //   - RELEVANT_POSTS_BY_TAG — civic issues (lighting, manholes, parking,
