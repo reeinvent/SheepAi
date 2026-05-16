@@ -22,6 +22,7 @@ export interface IssueMetadata {
   startedBy?: string;
   resolvedBy?: string;
   rejectedBy?: string;
+  sourceLinks?: string[];
 }
 
 export function getMetadata(ticket: TicketObject): IssueMetadata {
