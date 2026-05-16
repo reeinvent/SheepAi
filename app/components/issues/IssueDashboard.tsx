@@ -21,6 +21,7 @@ import {
 import type {
   IssueDraft,
   IssueFilter,
+  IssueMetadata,
   IssueStats as IssueStatsValue,
   TicketObject,
   TicketStatus,
@@ -68,6 +69,13 @@ const STATUS_ACTION: Record<
     variant: "danger",
     message: "Reject this issue?",
   },
+};
+
+const STATUS_ACTOR_KEY: Partial<Record<TicketStatus, keyof IssueMetadata>> = {
+  open: "approvedBy",
+  in_progress: "startedBy",
+  resolved: "resolvedBy",
+  rejected: "rejectedBy",
 };
 
 function nextId(tickets: TicketObject[]): string {
@@ -157,10 +165,16 @@ export function IssueDashboard({
     if (!pendingChange) return;
     const { ticket, nextStatus } = pendingChange;
     const updatedAt = new Date();
+    const actorKey = STATUS_ACTOR_KEY[nextStatus];
+    const metadataPatch = actorKey
+      ? { metadata: { ...ticket.metadata, [actorKey]: "John Doe" } }
+      : {};
 
     setTickets((curr) =>
       curr.map((t) =>
-        t.id === ticket.id ? { ...t, status: nextStatus, updatedAt } : t,
+        t.id === ticket.id
+          ? { ...t, status: nextStatus, updatedAt, ...metadataPatch }
+          : t,
       ),
     );
 
