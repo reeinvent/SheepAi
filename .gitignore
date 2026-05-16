@@ -36,8 +36,14 @@ yarn-error.log*
 # vercel
 .vercel
 
-# ingested data
+# database
 /data
+*.db
+*.sqlite
+*.sqlite3
+
+# ingested data
+/rawJson
 
 # typescript
 *.tsbuildinfo
