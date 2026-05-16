@@ -37,8 +37,10 @@ model Ticket {
   id            String   @id @default(cuid())
   title         String
   description   String?
-  status        String   @default("open") // open, in_progress, closed, resolved
-  priority      String   @default("medium") // low, medium, high, critical
+  // Status: pending_approval | open | in_progress | resolved | rejected
+  status        String   @default("pending_approval")
+  // Priority: low | medium | high | critical
+  priority      String   @default("medium")
   
   // Relationship to RawIngestorOutput
   rawOutputs    RawIngestorOutput[]

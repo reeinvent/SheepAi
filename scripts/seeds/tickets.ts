@@ -10,7 +10,7 @@ export async function seedTickets(prisma: PrismaClient) {
       {
         title: 'Loše stanje cesta na Rivi u Splitu',
         description: 'Ceste na Rivi su u lošem stanju s pukotinama koje su opasne za bicikliste i pješake. Potrebna je hitna sanacija.',
-        status: 'open',
+        status: 'pending_approval',
         priority: 'high',
       },
       {
