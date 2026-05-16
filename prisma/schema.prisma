@@ -48,6 +48,10 @@ model Ticket {
   lat           Float?
   lon           Float?
   location      String?
+  approvedBy    String?
+  startedBy     String?
+  resolvedBy    String?
+  rejectedBy    String?
 
   // Relationship to RawIngestorOutput
   rawOutputs    RawIngestorOutput[]

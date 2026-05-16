@@ -30,6 +30,11 @@ import {
   type TicketObject,
   type TicketStatus,
 } from "@/app/lib/issues/types";
+import {
+  createTicket,
+  updateTicket,
+} from "@/app/lib/actions/ticketActions";
+import { dbTicketToTicketObject } from "@/app/lib/issues/mappers";
 
 interface IssueDashboardProps {
   initialTickets: TicketObject[];
@@ -82,13 +87,6 @@ const STATUS_ACTOR_KEY: Partial<Record<TicketStatus, keyof IssueMetadata>> = {
   rejected: "rejectedBy",
 };
 
-function nextId(tickets: TicketObject[]): string {
-  const max = tickets.reduce((acc, t) => {
-    const n = Number.parseInt(t.id, 10);
-    return Number.isFinite(n) && n > acc ? n : acc;
-  }, 0);
-  return String(max + 1);
-}
 
 export function IssueDashboard({
   initialTickets,
@@ -140,19 +138,18 @@ export function IssueDashboard({
   );
 
   const handleCreate = async (draft: IssueDraft) => {
-    const now = new Date();
-    const newTicket: TicketObject = {
-      id: nextId(tickets),
-      title: draft.title,
-      body: draft.body,
-      createdAt: now,
-      updatedAt: now,
-      status: "pending_approval",
-      metadata: { ...draft.metadata },
-    };
-    setTickets((curr) => [newTicket, ...curr]);
-    setReportOpen(false);
-    toast.push("Problem uspješno prijavljen");
+    try {
+      const dbTicket = await createTicket({
+        title: draft.title,
+        description: draft.body,
+      });
+      const newTicket = dbTicketToTicketObject(dbTicket);
+      setTickets((curr) => [newTicket, ...curr]);
+      setReportOpen(false);
+      toast.push("Problem uspješno prijavljen");
+    } catch {
+      toast.push("Greška pri prijavi problema");
+    }
   };
 
   const handleStatusChange = (
@@ -185,27 +182,43 @@ export function IssueDashboard({
     setPendingChange({ ticket, nextStatus: "in_progress" });
   };
 
-  const applyStatusChange = (priority?: IssuePriority) => {
+  const applyStatusChange = async (priority?: IssuePriority) => {
     if (!pendingChange) return;
     const { ticket, nextStatus } = pendingChange;
-    const updatedAt = new Date();
     const actorKey = STATUS_ACTOR_KEY[nextStatus];
 
     const nextMetadata: Record<string, unknown> = { ...ticket.metadata };
     if (actorKey) nextMetadata[actorKey] = "John Doe";
     if (priority) nextMetadata.priority = priority;
 
-    setTickets((curr) =>
-      curr.map((t) =>
-        t.id === ticket.id
-          ? { ...t, status: nextStatus, updatedAt, metadata: nextMetadata }
-          : t,
-      ),
-    );
+    try {
+      await updateTicket(ticket.id, {
+        status: nextStatus,
+        ...(priority && { priority: priority.toLowerCase() }),
+        ...(nextStatus === "open" && { approvedBy: "John Doe" }),
+        ...(nextStatus === "in_progress" && {
+          startedBy: "John Doe",
+          lat: nextMetadata.lat as number | undefined,
+          lon: nextMetadata.lng as number | undefined,
+          location: nextMetadata.location as string | undefined,
+        }),
+        ...(nextStatus === "resolved" && { resolvedBy: "John Doe" }),
+        ...(nextStatus === "rejected" && { rejectedBy: "John Doe" }),
+      });
 
-    setDetailTicket(null);
-
-    toast.push(`Problem označen kao ${STATUS_LABEL[nextStatus].toLowerCase()}`);
+      const updatedAt = new Date();
+      setTickets((curr) =>
+        curr.map((t) =>
+          t.id === ticket.id
+            ? { ...t, status: nextStatus, updatedAt, metadata: nextMetadata }
+            : t,
+        ),
+      );
+      setDetailTicket(null);
+      toast.push(`Problem označen kao ${STATUS_LABEL[nextStatus].toLowerCase()}`);
+    } catch {
+      toast.push("Greška pri ažuriranju problema");
+    }
     setPendingChange(null);
   };
 
