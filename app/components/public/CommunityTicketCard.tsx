@@ -6,6 +6,7 @@ import {
   getMetadata,
   type TicketObject,
   type TicketStatus,
+  CATEGORY_LABEL,
 } from "@/app/lib/issues/types";
 
 const STATUS_TONE: Record<TicketStatus, BadgeTone> = {
@@ -65,7 +66,7 @@ export function CommunityTicketCard({
         <div>
           {meta.category && (
             <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-slate-100 text-slate-600">
-              {meta.category}
+              {CATEGORY_LABEL[meta.category] ?? meta.category}
             </span>
           )}
         </div>

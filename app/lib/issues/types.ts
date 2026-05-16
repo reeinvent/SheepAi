@@ -22,6 +22,7 @@ export interface IssueMetadata {
   startedBy?: string;
   resolvedBy?: string;
   rejectedBy?: string;
+  sourceLinks?: string[];
 }
 
 export function getMetadata(ticket: TicketObject): IssueMetadata {
@@ -38,6 +39,19 @@ export const ISSUE_CATEGORIES: IssueCategory[] = [
 ];
 
 export const ISSUE_PRIORITIES: IssuePriority[] = ["Low", "Medium", "High"];
+
+export const PRIORITY_LABEL: Record<IssuePriority, string> = {
+  Low: "Nisko",
+  Medium: "Srednje",
+  High: "Visoko",
+};
+
+export const CATEGORY_LABEL: Record<string, string> = {
+  "CITY-ADMIN": "Gradska uprava",
+  ELECTRICITY: "Struja i rasvjeta",
+  SANITATION: "Čistoća i otpad",
+  WATERSUPPLY: "Vodoopskrba",
+};
 
 export const TICKET_STATUSES: TicketStatus[] = [
   "pending_approval",

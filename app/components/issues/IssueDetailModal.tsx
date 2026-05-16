@@ -15,6 +15,8 @@ import {
   type IssuePriority,
   type TicketObject,
   type TicketStatus,
+  PRIORITY_LABEL,
+  CATEGORY_LABEL,
 } from "@/app/lib/issues/types";
 
 const STATUS_BG: Record<TicketStatus, string> = {
@@ -120,8 +122,8 @@ export function IssueDetailModal({
       <div className="space-y-4">
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           <DetailStat label="Status" value={STATUS_LABEL[ticket.status]} bg={STATUS_BG[ticket.status]} />
-          <DetailStat label="Prioritet" value={meta.priority ?? "—"} bg={meta.priority ? PRIORITY_BG[meta.priority] : undefined} />
-          <DetailStat label="Kategorija" value={meta.category ?? "—"} />
+          <DetailStat label="Prioritet" value={meta.priority ? PRIORITY_LABEL[meta.priority] : "—"} bg={meta.priority ? PRIORITY_BG[meta.priority] : undefined} />
+          <DetailStat label="Kategorija" value={meta.category ? (CATEGORY_LABEL[meta.category] ?? meta.category) : "—"} />
           <DetailStat label="Prijavljeno" value={formatDate(ticket.createdAt)} />
         </div>
 
@@ -133,6 +135,28 @@ export function IssueDetailModal({
             {ticket.body}
           </p>
         </div>
+
+        {meta.sourceLinks && meta.sourceLinks.length > 0 && (
+          <div className="border-t border-slate-200 pt-4">
+            <h3 className="text-sm font-semibold text-slate-700 mb-2">
+              Izvori
+            </h3>
+            <ul className="space-y-1 max-h-40 overflow-y-auto pr-1">
+              {meta.sourceLinks.map((url) => (
+                  <li key={url}>
+                    <a
+                      href={url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-emerald-600 underline hover:no-underline break-all"
+                    >
+                      {url}
+                    </a>
+                  </li>
+                ))}
+            </ul>
+          </div>
+        )}
 
         {(meta.approvedBy || meta.startedBy || meta.resolvedBy || meta.rejectedBy) && (
           <div className="border-t border-slate-200 pt-4 space-y-1">
