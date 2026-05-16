@@ -1,3 +1,5 @@
+import { Logo } from "./Logo";
+
 interface FooterLink {
   label: string;
   href: string;
@@ -35,13 +37,11 @@ export function PublicFooter() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 grid grid-cols-2 sm:grid-cols-4 gap-6 text-sm">
         <div className="col-span-2 sm:col-span-1">
           <div className="flex items-center gap-2 mb-2">
-            <div className="w-7 h-7 rounded-lg bg-emerald-600 text-white flex items-center justify-center font-bold text-sm">
-              B
-            </div>
-            <span className="font-bold text-slate-800">Beeeeee</span>
+            <Logo size={28} />
+            <span className="font-bold text-slate-800">Peristil</span>
           </div>
           <p className="text-slate-500 text-xs">
-            Community-powered city issue reporting.
+            Community-powered issue reporting for Split.
           </p>
         </div>
         {SECTIONS.map((section) => (
@@ -60,7 +60,7 @@ export function PublicFooter() {
         ))}
       </div>
       <div className="border-t border-slate-200 py-4 text-center text-xs text-slate-500">
-        © {year} Beeeeee. All rights reserved.
+        © {year} Peristil. All rights reserved.
       </div>
     </footer>
   );

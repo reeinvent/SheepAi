@@ -6,7 +6,7 @@ import type {
 } from "react";
 
 const baseControl =
-  "w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500";
+  "w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-cyan-600";
 
 interface FieldProps {
   label: string;

@@ -2,44 +2,30 @@
 
 import { useState, type FormEvent } from "react";
 import { Button } from "../ui/Button";
-import { Field, SelectInput, TextArea, TextInput } from "../ui/Field";
+import { Field, TextArea, TextInput } from "../ui/Field";
 import { Modal } from "../ui/Modal";
-import {
-  ISSUE_CATEGORIES,
-  ISSUE_PRIORITIES,
-  type IssueCategory,
-  type IssueDraft,
-  type IssuePriority,
-} from "@/app/lib/issues/types";
+import type { IssueDraft } from "@/app/lib/issues/types";
 
 interface IssueReportModalProps {
   open: boolean;
   onClose: () => void;
   onSubmit: (draft: IssueDraft) => Promise<void> | void;
-  hidePriority?: boolean;
 }
 
 interface FormState {
   title: string;
   body: string;
-  category: IssueCategory;
-  priority: IssuePriority;
-  location: string;
 }
 
 const EMPTY: FormState = {
   title: "",
   body: "",
-  category: "Roads",
-  priority: "Medium",
-  location: "",
 };
 
 export function IssueReportModal({
   open,
   onClose,
   onSubmit,
-  hidePriority = false,
 }: IssueReportModalProps) {
   const [form, setForm] = useState<FormState>(EMPTY);
   const [submitting, setSubmitting] = useState(false);
@@ -51,11 +37,7 @@ export function IssueReportModal({
       await onSubmit({
         title: form.title,
         body: form.body,
-        metadata: {
-          category: form.category,
-          ...(hidePriority ? {} : { priority: form.priority }),
-          location: form.location,
-        },
+        metadata: {},
       });
       setForm(EMPTY);
     } finally {
@@ -69,91 +51,16 @@ export function IssueReportModal({
   };
 
   return (
-    <Modal open={open} onClose={handleClose} title="Report New Issue">
+    <Modal open={open} onClose={handleClose} title="Report new issue">
       <form onSubmit={handleSubmit} className="space-y-3">
         <Field label="Title" htmlFor="inp-title">
           <TextInput
             id="inp-title"
             required
             value={form.title}
-            placeholder="e.g. Pothole on Main St"
+            placeholder="e.g. Pothole on the Riva"
             onChange={(e) =>
               setForm((f) => ({ ...f, title: e.target.value }))
-            }
-          />
-        </Field>
-
-        {hidePriority ? (
-          <Field label="Category" htmlFor="inp-category">
-            <SelectInput
-              id="inp-category"
-              required
-              value={form.category}
-              onChange={(e) =>
-                setForm((f) => ({
-                  ...f,
-                  category: e.target.value as IssueCategory,
-                }))
-              }
-            >
-              {ISSUE_CATEGORIES.map((c) => (
-                <option key={c} value={c}>
-                  {c}
-                </option>
-              ))}
-            </SelectInput>
-          </Field>
-        ) : (
-          <div className="grid grid-cols-2 gap-3">
-            <Field label="Category" htmlFor="inp-category">
-              <SelectInput
-                id="inp-category"
-                required
-                value={form.category}
-                onChange={(e) =>
-                  setForm((f) => ({
-                    ...f,
-                    category: e.target.value as IssueCategory,
-                  }))
-                }
-              >
-                {ISSUE_CATEGORIES.map((c) => (
-                  <option key={c} value={c}>
-                    {c}
-                  </option>
-                ))}
-              </SelectInput>
-            </Field>
-            <Field label="Priority" htmlFor="inp-priority">
-              <SelectInput
-                id="inp-priority"
-                required
-                value={form.priority}
-                onChange={(e) =>
-                  setForm((f) => ({
-                    ...f,
-                    priority: e.target.value as IssuePriority,
-                  }))
-                }
-              >
-                {ISSUE_PRIORITIES.map((p) => (
-                  <option key={p} value={p}>
-                    {p}
-                  </option>
-                ))}
-              </SelectInput>
-            </Field>
-          </div>
-        )}
-
-        <Field label="Location" htmlFor="inp-location">
-          <TextInput
-            id="inp-location"
-            required
-            value={form.location}
-            placeholder="e.g. 123 Main Street"
-            onChange={(e) =>
-              setForm((f) => ({ ...f, location: e.target.value }))
             }
           />
         </Field>

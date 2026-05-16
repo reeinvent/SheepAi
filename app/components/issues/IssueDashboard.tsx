@@ -6,6 +6,7 @@ import { Icon } from "../ui/Icon";
 import { MobileMenuButton } from "../ui/MobileMenuButton";
 import { useToast } from "../ui/Toast";
 import { isWithinDateRange, type DateRange } from "../ui/DateRangePicker";
+import { ApprovalModal } from "./ApprovalModal";
 import { ConfirmActionModal } from "./ConfirmActionModal";
 import { IssueDetailModal } from "./IssueDetailModal";
 import { IssueFilters } from "./IssueFilters";
@@ -19,13 +20,15 @@ import {
   getForwardStatus,
   isValidStatusTransition,
 } from "@/app/lib/issues/statusTransitions";
-import type {
-  IssueDraft,
-  IssueFilter,
-  IssueMetadata,
-  IssueStats as IssueStatsValue,
-  TicketObject,
-  TicketStatus,
+import {
+  getMetadata,
+  type IssueDraft,
+  type IssueFilter,
+  type IssueMetadata,
+  type IssuePriority,
+  type IssueStats as IssueStatsValue,
+  type TicketObject,
+  type TicketStatus,
 } from "@/app/lib/issues/types";
 
 interface IssueDashboardProps {
@@ -89,7 +92,7 @@ function nextId(tickets: TicketObject[]): string {
 
 export function IssueDashboard({
   initialTickets,
-  title = "Beeeeee",
+  title = "Peristil",
 }: IssueDashboardProps) {
   const [tickets, setTickets] = useState<TicketObject[]>(initialTickets);
   const [statusFilter, setStatusFilter] = useState<IssueFilter>("all");
@@ -182,19 +185,20 @@ export function IssueDashboard({
     setPendingChange({ ticket, nextStatus: "in_progress" });
   };
 
-  const confirmStatusChange = async () => {
+  const applyStatusChange = (priority?: IssuePriority) => {
     if (!pendingChange) return;
     const { ticket, nextStatus } = pendingChange;
     const updatedAt = new Date();
     const actorKey = STATUS_ACTOR_KEY[nextStatus];
-    const metadataPatch = actorKey
-      ? { metadata: { ...ticket.metadata, [actorKey]: "John Doe" } }
-      : {};
+
+    const nextMetadata: Record<string, unknown> = { ...ticket.metadata };
+    if (actorKey) nextMetadata[actorKey] = "John Doe";
+    if (priority) nextMetadata.priority = priority;
 
     setTickets((curr) =>
       curr.map((t) =>
         t.id === ticket.id
-          ? { ...t, status: nextStatus, updatedAt, ...metadataPatch }
+          ? { ...t, status: nextStatus, updatedAt, metadata: nextMetadata }
           : t,
       ),
     );
@@ -204,6 +208,10 @@ export function IssueDashboard({
     toast.push(`Problem označen kao ${STATUS_LABEL[nextStatus].toLowerCase()}`);
     setPendingChange(null);
   };
+
+  const isApprovalFlow =
+    pendingChange?.ticket.status === "pending_approval" &&
+    pendingChange?.nextStatus === "open";
 
   const confirmConfig = useMemo(() => {
     if (!pendingChange) {
@@ -275,11 +283,21 @@ export function IssueDashboard({
       />
 
       <ConfirmActionModal
-        open={pendingChange !== null}
+        open={pendingChange !== null && !isApprovalFlow}
         action={confirmConfig.action}
         message={confirmConfig.message}
         onCancel={() => setPendingChange(null)}
-        onConfirm={confirmStatusChange}
+        onConfirm={() => applyStatusChange()}
+      />
+
+      <ApprovalModal
+        key={pendingChange?.ticket.id ?? "none"}
+        open={pendingChange !== null && isApprovalFlow}
+        defaultPriority={
+          pendingChange ? getMetadata(pendingChange.ticket).priority : undefined
+        }
+        onCancel={() => setPendingChange(null)}
+        onConfirm={(priority) => applyStatusChange(priority)}
       />
     </div>
   );

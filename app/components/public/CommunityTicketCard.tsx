@@ -46,9 +46,9 @@ export function CommunityTicketCard({
       tabIndex={interactive ? 0 : undefined}
       onClick={interactive ? handleClick : undefined}
       onKeyDown={interactive ? handleKeyDown : undefined}
-      className={`bg-white rounded-2xl border border-slate-200 hover:border-emerald-300 hover:shadow-xl hover:shadow-emerald-500/5 hover:-translate-y-0.5 transition-all p-5 flex flex-col ${
+      className={`bg-white rounded-2xl border border-slate-200 hover:border-cyan-300 hover:shadow-xl hover:shadow-cyan-700/5 hover:-translate-y-0.5 transition-all p-5 flex flex-col ${
         interactive
-          ? "cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
+          ? "cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-600"
           : ""
       }`}
     >
