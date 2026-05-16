@@ -1,0 +1,51 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// Stage 4 output: canonical records from the LLM stage
+// Represents a single raw ingestion output that has been validated
+model RawIngestorOutput {
+  id            String   @id @default(cuid())
+  dataSource    String   // "reddit", "twitter", etc.
+  summary       String   // LLM-generated summary of the issue
+  timestamp     DateTime // ISO 8601 when the issue was reported upstream
+  metadata      String?  // JSON string of freeform per-record context (ids, urls, author, ...)
+  
+  // Relationship to Ticket
+  ticketId      String?
+  ticket        Ticket?  @relation(fields: [ticketId], references: [id], onDelete: SetNull)
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@index([dataSource])
+  @@index([ticketId])
+  @@index([timestamp])
+}
+
+// A ticket represents a consolidated issue that may have multiple raw ingestion outputs
+// This is the final destination for promoted records
+model Ticket {
+  id            String   @id @default(cuid())
+  title         String
+  description   String?
+  status        String   @default("open") // open, in_progress, closed, resolved
+  priority      String   @default("medium") // low, medium, high, critical
+  
+  // Relationship to RawIngestorOutput
+  rawOutputs    RawIngestorOutput[]
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@index([status])
+  @@index([priority])
+}
