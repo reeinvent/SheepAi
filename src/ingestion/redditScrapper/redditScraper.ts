@@ -1,4 +1,5 @@
-import { CITY_KEYWORDS } from './keywords';
+import { CITY_KEYWORDS } from '../keywords';
+import { cleanText, isValidText } from '@/src/utils/textCleaner';
 
 interface RedditComment {
   id: string;
@@ -19,6 +20,15 @@ interface RedditPost {
   subreddit: string;
   score: number;
   comments?: RedditComment[];
+}
+
+// Cleaned data structure for LLM processing
+export interface CleanedPost {
+  title: string;
+  content: string;
+  comments: string[];
+  score: number;
+  timestamp: number;
 }
 
 interface RedditResponse {
@@ -149,6 +159,29 @@ export async function getSubredditPosts(
   }
 }
 
+// Helper function to convert raw post to cleaned post for LLM
+function cleanPost(post: RedditPost): CleanedPost | null {
+  const title = cleanText(post.title);
+  const content = cleanText(post.selftext);
+  
+  // Only include if there's meaningful content
+  if (!isValidText(title) && !isValidText(content)) {
+    return null;
+  }
+  
+  const comments = (post.comments || [])
+    .map(comment => cleanText(comment.body))
+    .filter(text => isValidText(text, 5)); // Minimum 5 chars for comments
+  
+  return {
+    title: title || '(No title)',
+    content: content || '(No content)',
+    comments,
+    score: post.score,
+    timestamp: post.created_utc,
+  };
+}
+
 // Helper function to filter out irrelevant posts using Croatian keywords
 function isRelevantToSplit(post: RedditPost): boolean {
   const text = `${post.title} ${post.selftext}`.toLowerCase();
@@ -165,7 +198,7 @@ function isRelevantToSplit(post: RedditPost): boolean {
 }
 
 // Helper function to search for Split, Croatia specific info
-export async function searchSplitCroatia(limit: number = 25, includeComments: boolean = true): Promise<RedditPost[]> {
+export async function searchSplitCroatia(limit: number = 25, includeComments: boolean = true): Promise<CleanedPost[]> {
   const allPosts: RedditPost[] = [];
   const seenIds = new Set<string>();
 
@@ -209,6 +242,12 @@ export async function searchSplitCroatia(limit: number = 25, includeComments: bo
     }
   }
 
-  // Sort by score (most relevant/upvoted first)
-  return allPosts.sort((a, b) => b.score - a.score).slice(0, limit);
+  // Convert to cleaned posts and filter out empty ones
+  const cleanedPosts = allPosts
+    .map(post => cleanPost(post))
+    .filter((post): post is CleanedPost => post !== null)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, limit);
+
+  return cleanedPosts;
 }
