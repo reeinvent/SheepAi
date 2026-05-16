@@ -15,7 +15,6 @@
     "db:reset": "prisma migrate reset",
     "db:generate": "prisma generate",
     "db:seed": "tsx scripts/seed.ts"
-    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",
