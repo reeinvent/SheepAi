@@ -46,6 +46,7 @@ The possible categories with an explanation:
 SANITATION - anything related to trash like overflowing cans, bad smells and so on. This will be shown to the sanitation department
 WATERSUPPLY - murky water etc, meant to be sent to the water utilities
 CITY-ADMIN - things that the city administration will want to know about
+ELECTRICITY - anything related to the power utility
 UNCATEGORIZED - only if it does not fall under the rest.
 
 ### What NOT to do
