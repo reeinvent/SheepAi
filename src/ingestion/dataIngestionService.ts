@@ -1,7 +1,9 @@
 import { mkdir, readdir, readFile, rename, writeFile } from "node:fs/promises";
 import { dirname, join, relative, sep } from "node:path";
+import { prisma } from "@/app/lib/db";
 import {
   validateIngestedRecords,
+  type BaseIngestedRecord,
   type Ingestor,
   type ValidationFailure,
 } from "./ingestor";
@@ -259,11 +261,28 @@ export class DataIngestionService {
       );
     }
 
+    const uploaded = await this.uploadValidated(valid);
+
     this.logger(
-      `[validate] ${relPath}: ${valid.length} valid, ${failures.length} failed`,
+      `[validate] ${relPath}: ${valid.length} valid, ${failures.length} failed, ${uploaded} uploaded`,
     );
 
     await this.moveOut(absPath, relPath, this.processedSubdir);
+  }
+
+  private async uploadValidated(
+    records: BaseIngestedRecord[],
+  ): Promise<number> {
+    if (records.length === 0) return 0;
+    const result = await prisma.rawIngestorOutput.createMany({
+      data: records.map((r) => ({
+        dataSource: r.dataSource,
+        summary: r.summary,
+        timestamp: new Date(r.timestamp),
+        metadata: r.metadata ? JSON.stringify(r.metadata) : null,
+      })),
+    });
+    return result.count;
   }
 
   private async moveOut(

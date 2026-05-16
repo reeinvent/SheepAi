@@ -32,7 +32,7 @@ Return a JSON array of records. Each record must match:
 \`\`\`json
 {
   "dataSource": "<newspaper name, e.g. Dalmacija Danas>",
-  "summary": "<1–3 sentence objective summary in English>",
+  "summary": "<1–3 sentence objective summary in Croatian>",
   "timestamp": "<ISO 8601 with timezone offset from the article pubDate>",
   "metadata": {
     "url": "<article url>",

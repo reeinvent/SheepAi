@@ -96,7 +96,7 @@ For each kept post, emit one record matching:
 \`\`\`json
 {
   "dataSource": "x",
-  "summary": "<one-sentence description of the issue in English>",
+  "summary": "<one-sentence description of the issue in Croatian>",
   "timestamp": "<the post's createdAt, ISO 8601 with offset>",
   "metadata": {
     "postId": "<XPost.id>",
