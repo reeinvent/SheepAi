@@ -263,6 +263,42 @@ const RELEVANT_POSTS_BY_TAG: Record<string, PostTemplate[]> = {
         quote_count: 0,
       },
     },
+    // Semantic duplicate of `old_town_split` (@split, English): same
+    // flickering streetlight on Šperun, reported by a different resident
+    // in Croatian a few hours later. Used to exercise ticket-matching.
+    {
+      text: "Lampa u ulici Šperun već treći tjedan trepće, sinoć smo doslovno hodali u mraku do stana. Hoće li to ikad biti popravljeno? #split",
+      authorUsername: "sperun_stanari",
+      authorName: "Josip M.",
+      authorId: "1928374650",
+      ageMinutes: 130,
+      lang: "hr",
+      extraHashtags: ["rasvjeta", "starigrad"],
+      metrics: {
+        retweet_count: 3,
+        reply_count: 2,
+        like_count: 16,
+        quote_count: 0,
+      },
+    },
+    // Semantic duplicate of `velebitska_resident` (@split): same collapsed
+    // manhole in Velebitska, still unrepaired, reported by another
+    // neighbour. Used to exercise ticket-matching.
+    {
+      text: "Još uvijek čekamo da netko popravi taj propali šaht u Velebitskoj. Čunjevi su tu već 14 dana, ovo je sramota. #split",
+      authorUsername: "kvart_velebitska",
+      authorName: "Igor B.",
+      authorId: "2018374516",
+      ageMinutes: 70,
+      lang: "hr",
+      extraHashtags: ["sahtovi", "ceste"],
+      metrics: {
+        retweet_count: 6,
+        reply_count: 4,
+        like_count: 22,
+        quote_count: 1,
+      },
+    },
   ],
   "@split": [
     {
@@ -353,6 +389,24 @@ const RELEVANT_POSTS_BY_TAG: Record<string, PostTemplate[]> = {
         retweet_count: 2,
         reply_count: 1,
         like_count: 12,
+        quote_count: 0,
+      },
+    },
+    // Semantic duplicate of `ana_marjan` (#split): same broken lamp at the
+    // entrance to Šuma Marjan, reported by a runner on a different day.
+    // Used to exercise ticket-matching.
+    {
+      text: "@split jučer trčao Marjanom, kod ulaza u park je opet mrak — ona velika lampa kraj rampe i dalje ne radi. Riješite to molim vas.",
+      authorUsername: "marjan_runner",
+      authorName: "Davor T.",
+      authorId: "1736284953",
+      ageMinutes: 30,
+      lang: "hr",
+      extraHashtags: ["rasvjeta", "marjan"],
+      metrics: {
+        retweet_count: 4,
+        reply_count: 3,
+        like_count: 19,
         quote_count: 0,
       },
     },

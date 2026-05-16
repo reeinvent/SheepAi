@@ -22,6 +22,8 @@ model RawIngestorOutput {
   // Relationship to Ticket
   ticketId      String?
   ticket        Ticket?  @relation(fields: [ticketId], references: [id], onDelete: SetNull)
+
+  processedAt   DateTime?
   
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
