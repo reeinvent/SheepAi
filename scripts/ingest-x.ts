@@ -1,4 +1,4 @@
-import { XIngestor } from "../src/ingestion/xIngestor";
+import { XIngestor } from "../src/ingestion/X/xIngestor";
 
 async function main(): Promise<void> {
   const args = process.argv.slice(2).filter(Boolean);

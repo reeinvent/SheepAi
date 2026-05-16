@@ -91,7 +91,18 @@ export class IngestorValidationError extends Error {
 // bad LLM run can be retried independently.
 export abstract class Ingestor<TRaw = unknown> {
   abstract readonly dataSource: string;
-  protected readonly rawDir: string;
+  // How often `DataIngestionService` should re-run this ingestor's
+  // fetch+stage cycle. Declared on the class so cadence travels with the
+  // adapter (a flaky source can be polled less often without touching
+  // orchestrator config). The service reads this once at register() time.
+  abstract readonly intervalMs: number;
+  // Per-source instructions for the external LLM stage. The service
+  // writes this verbatim to `<rawDir>/<dataSource>/INSTRUCTIONS.md` on
+  // start; the LLM reads it before parsing the raw files in the same
+  // folder. Each ingestor owns its own instructions because the raw
+  // shape, filtering rules, and output expectations differ per source.
+  abstract readonly llmInstructions: string;
+  readonly rawDir: string;
 
   constructor(rawDir = "data/raw") {
     this.rawDir = rawDir;
@@ -200,6 +211,15 @@ export function validateIngestedRecords(
   return { valid, failures };
 }
 
+// Preserve common prefix markers BEFORE the generic non-alphanumeric strip,
+// otherwise sources like "#split" and "@split" collapse to the same name
+// and the second batch in a run silently overwrites the first on disk.
 function sanitize(value: string): string {
-  return value.replace(/[^a-zA-Z0-9_-]/g, "_").replace(/^_+|_+$/g, "") || "unknown";
+  return (
+    value
+      .replace(/^#/, "hash_")
+      .replace(/^@/, "at_")
+      .replace(/[^a-zA-Z0-9_-]/g, "_")
+      .replace(/^_+|_+$/g, "") || "unknown"
+  );
 }
