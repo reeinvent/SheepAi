@@ -43,7 +43,9 @@ model Ticket {
   status        String   @default("pending_approval")
   // Priority: low | medium | high | critical
   priority      String   @default("medium")
-  
+  // JSON array of: SANITATION | WATERSUPPLY | CITY-ADMIN | UNCATEGORIZED
+  categories    String
+
   // Relationship to RawIngestorOutput
   rawOutputs    RawIngestorOutput[]
   

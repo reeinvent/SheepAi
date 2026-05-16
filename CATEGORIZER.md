@@ -38,6 +38,16 @@ Generate the title yourself. Croatian is the primary language.
 4. Verify `stillUnprocessed === 0` and that each new ticket has the expected `rawOutputs.length`.
 5. Delete the throwaway script when done — this is a one-off task, not a service.
 
+### Determining ticket category
+
+Each ticket needs to be categorized. Determine ticket category based on the contents. It can have multiple categories but has to have at least one. Use UNCATEGORIZED when you cannot figure out where it fits. The category field is a JSON string array.
+
+The possible categories with an explanation:
+SANITATION - anything related to trash like overflowing cans, bad smells and so on. This will be shown to the sanitation department
+WATERSUPPLY - murky water etc, meant to be sent to the water utilities
+CITY-ADMIN - things that the city administration will want to know about
+UNCATEGORIZED - only if it does not fall under the rest.
+
 ### What NOT to do
 
 - Don't write a reusable `scripts/categorize.ts` and leave it in the repo. There is no LLM call to automate; the judgment lives in the assistant.
