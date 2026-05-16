@@ -5,6 +5,12 @@ import { Button } from "../ui/Button";
 import { Modal } from "../ui/Modal";
 import { ISSUE_PRIORITIES, type IssuePriority } from "@/app/lib/issues/types";
 
+const PRIORITY_LABEL: Record<IssuePriority, string> = {
+  Low: "Nisko",
+  Medium: "Srednje",
+  High: "Visoko",
+};
+
 interface ApprovalModalProps {
   open: boolean;
   defaultPriority?: IssuePriority;
@@ -43,9 +49,9 @@ export function ApprovalModal({
   };
 
   return (
-    <Modal open={open} onClose={onCancel} size="sm" title="Approve issue">
+    <Modal open={open} onClose={onCancel} size="sm" title="Odobri problem">
       <p className="text-sm text-slate-600 mb-3">
-        Set the priority before approving.
+        Postavite prioritet prije odobravanja.
       </p>
       <div className="grid grid-cols-3 gap-2 mb-5">
         {ISSUE_PRIORITIES.map((p) => {
@@ -60,7 +66,7 @@ export function ApprovalModal({
                 active ? PRIORITY_ACTIVE[p] : PRIORITY_RESTING[p]
               }`}
             >
-              {p}
+              {PRIORITY_LABEL[p]}
             </button>
           );
         })}
@@ -72,7 +78,7 @@ export function ApprovalModal({
           onClick={onCancel}
           disabled={submitting}
         >
-          Cancel
+          Odustani
         </Button>
         <Button
           variant="primary"
@@ -80,7 +86,7 @@ export function ApprovalModal({
           onClick={handleConfirm}
           disabled={submitting}
         >
-          {submitting ? "Approving..." : "Approve"}
+          {submitting ? "Odobrava se..." : "Odobri"}
         </Button>
       </div>
     </Modal>

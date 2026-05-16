@@ -48,7 +48,7 @@ function formatShort(iso: string): string {
   });
 }
 
-const WEEKDAYS = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
+const WEEKDAYS = ["Po", "Ut", "Sr", "Če", "Pe", "Su", "Ne"];
 
 interface DateRangePickerProps {
   value: DateRange;
@@ -81,11 +81,11 @@ export function DateRangePicker({ value, onChange }: DateRangePickerProps) {
   }, [open]);
 
   const summary = useMemo(() => {
-    if (!value.from && !value.to) return "All dates";
+    if (!value.from && !value.to) return "Svi datumi";
     if (value.from && value.to)
       return `${formatShort(value.from)} – ${formatShort(value.to)}`;
-    if (value.from) return `From ${formatShort(value.from)}`;
-    return `Until ${formatShort(value.to ?? "")}`;
+    if (value.from) return `Od ${formatShort(value.from)}`;
+    return `Do ${formatShort(value.to ?? "")}`;
   }, [value]);
 
   const hasRange = Boolean(value.from || value.to);
@@ -124,7 +124,7 @@ export function DateRangePicker({ value, onChange }: DateRangePickerProps) {
       {open && (
         <div
           role="dialog"
-          aria-label="Pick a date range"
+          aria-label="Odaberite vremenski raspon"
           className="absolute top-full left-0 mt-2 z-30 bg-white border border-slate-200 rounded-xl shadow-lg p-3 fade-in w-[280px]"
         >
           <CalendarHeader value={viewMonth} onChange={setViewMonth} />
@@ -140,14 +140,14 @@ export function DateRangePicker({ value, onChange }: DateRangePickerProps) {
               className="text-sm text-slate-500 hover:text-slate-700 disabled:opacity-50"
               disabled={!hasRange}
             >
-              Clear
+              Poništi
             </button>
             <button
               type="button"
               onClick={() => setOpen(false)}
               className="text-sm font-medium text-cyan-700 hover:text-cyan-800"
             >
-              Done
+              Gotovo
             </button>
           </div>
         </div>
@@ -172,7 +172,7 @@ function CalendarHeader({
     <div className="flex items-center justify-between mb-2">
       <button
         type="button"
-        aria-label="Previous month"
+        aria-label="Prethodni mjesec"
         onClick={() =>
           onChange(new Date(value.getFullYear(), value.getMonth() - 1, 1))
         }
@@ -183,7 +183,7 @@ function CalendarHeader({
       <span className="font-semibold text-slate-800 text-sm">{label}</span>
       <button
         type="button"
-        aria-label="Next month"
+        aria-label="Sljedeći mjesec"
         onClick={() =>
           onChange(new Date(value.getFullYear(), value.getMonth() + 1, 1))
         }

@@ -101,7 +101,7 @@ export function Sidebar({ brand, items, footer }: SidebarProps) {
           }`}
           role="dialog"
           aria-modal="true"
-          aria-label="Navigation"
+          aria-label="Navigacija"
         >
           {content}
         </aside>

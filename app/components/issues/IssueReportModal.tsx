@@ -51,9 +51,9 @@ export function IssueReportModal({
   };
 
   return (
-    <Modal open={open} onClose={handleClose} title="Report new issue">
+    <Modal open={open} onClose={handleClose} title="Prijavi novi problem">
       <form onSubmit={handleSubmit} className="space-y-3">
-        <Field label="Title" htmlFor="inp-title">
+        <Field label="Naslov" htmlFor="inp-title">
           <TextInput
             id="inp-title"
             required
@@ -65,13 +65,13 @@ export function IssueReportModal({
           />
         </Field>
 
-        <Field label="Description" htmlFor="inp-body">
+        <Field label="Opis" htmlFor="inp-body">
           <TextArea
             id="inp-body"
             required
             rows={3}
             value={form.body}
-            placeholder="Describe the issue..."
+            placeholder="Opišite problem..."
             onChange={(e) =>
               setForm((f) => ({ ...f, body: e.target.value }))
             }
@@ -85,7 +85,7 @@ export function IssueReportModal({
             onClick={handleClose}
             type="button"
           >
-            Cancel
+            Odustani
           </Button>
           <Button
             variant="primary"
@@ -93,7 +93,7 @@ export function IssueReportModal({
             type="submit"
             disabled={submitting}
           >
-            {submitting ? "Submitting..." : "Submit"}
+            {submitting ? "Šalje se..." : "Pošalji"}
           </Button>
         </div>
       </form>

@@ -86,7 +86,7 @@ export function IssueDetailModal({
     </>
   ) : (
     <Button variant="outline" className="flex-1" onClick={onClose}>
-      Close
+      Zatvori
     </Button>
   );
 

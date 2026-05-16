@@ -35,9 +35,9 @@ export const FORWARD_ACTION: Record<
   TicketStatus,
   { label: string; icon: IconName } | null
 > = {
-  pending_approval: { label: "Approve", icon: "check" },
-  open: { label: "Start work", icon: "loader" },
-  in_progress: { label: "Mark resolved", icon: "check-circle" },
+  pending_approval: { label: "Odobri", icon: "check" },
+  open: { label: "Započni rad", icon: "loader" },
+  in_progress: { label: "Označi kao riješeno", icon: "check-circle" },
   resolved: null,
   rejected: null,
 };

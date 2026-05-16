@@ -8,11 +8,11 @@ import {
 import { ToastProvider } from "./ui/Toast";
 
 const DEFAULT_NAV: SidebarNavItem[] = [
-  { label: "Dashboard", icon: "home", href: "/", active: true },
-  { label: "Community board", icon: "user", href: "/community" },
-  { label: "Map", icon: "map", disabled: true },
-  { label: "Analytics", icon: "bar-chart", disabled: true },
-  { label: "Settings", icon: "settings", disabled: true },
+  { label: "Nadzorna ploča", icon: "home", href: "/", active: true },
+  { label: "Oglasna ploča zajednice", icon: "user", href: "/community" },
+  { label: "Karta", icon: "map", disabled: true },
+  { label: "Analitika", icon: "bar-chart", disabled: true },
+  { label: "Postavke", icon: "settings", disabled: true },
 ];
 
 function Brand() {
@@ -21,7 +21,7 @@ function Brand() {
       <Logo size={36} />
       <div className="min-w-0">
         <p className="font-bold text-slate-800 truncate">Peristil</p>
-        <p className="text-xs text-slate-500 truncate">Split issue tracker</p>
+        <p className="text-xs text-slate-500 truncate">Pratilac gradskih problema</p>
       </div>
     </div>
   );
