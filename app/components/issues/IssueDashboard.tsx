@@ -12,6 +12,7 @@ import { IssueFilters } from "./IssueFilters";
 import { IssueList } from "./IssueList";
 import { IssueReportModal } from "./IssueReportModal";
 import { IssueStats } from "./IssueStats";
+import { LocationPickerModal } from "./LocationPickerModal";
 import { PageHeader } from "./PageHeader";
 import { STATUS_LABEL } from "./StatusBadge";
 import {
@@ -45,29 +46,29 @@ const STATUS_ACTION: Record<
   { label: string; variant: ConfirmVariant; message: string }
 > = {
   pending_approval: {
-    label: "Move to pending",
+    label: "Na čekanje",
     variant: "secondary",
-    message: "Move this issue back to pending?",
+    message: "Premjesti ovaj problem natrag na čekanje?",
   },
   open: {
-    label: "Approve",
+    label: "Odobri",
     variant: "primary",
-    message: "Approve this issue?",
+    message: "Odobri ovaj problem?",
   },
   in_progress: {
-    label: "Start work",
+    label: "Započni rad",
     variant: "primary",
-    message: "Mark this issue as in progress?",
+    message: "Započeti rad na ovom problemu?",
   },
   resolved: {
-    label: "Resolve",
+    label: "Riješi",
     variant: "primary",
-    message: "Mark this issue as resolved?",
+    message: "Označi ovaj problem kao riješen?",
   },
   rejected: {
-    label: "Reject",
+    label: "Odbij",
     variant: "danger",
-    message: "Reject this issue?",
+    message: "Odbij ovaj problem?",
   },
 };
 
@@ -99,9 +100,8 @@ export function IssueDashboard({
 
   const [reportOpen, setReportOpen] = useState(false);
   const [detailTicket, setDetailTicket] = useState<TicketObject | null>(null);
-  const [pendingChange, setPendingChange] = useState<PendingChange | null>(
-    null,
-  );
+  const [pendingChange, setPendingChange] = useState<PendingChange | null>(null);
+  const [locationTicket, setLocationTicket] = useState<TicketObject | null>(null);
 
   const toast = useToast();
 
@@ -149,7 +149,7 @@ export function IssueDashboard({
     };
     setTickets((curr) => [newTicket, ...curr]);
     setReportOpen(false);
-    toast.push("Issue reported successfully");
+    toast.push("Problem uspješno prijavljen");
   };
 
   const handleStatusChange = (
@@ -158,7 +158,28 @@ export function IssueDashboard({
   ) => {
     if (ticket.status === nextStatus) return;
     if (!isValidStatusTransition(ticket.status, nextStatus)) return;
+    if (nextStatus === "in_progress") {
+      setLocationTicket(ticket);
+      return;
+    }
     setPendingChange({ ticket, nextStatus });
+  };
+
+  const handleLocationConfirm = (coords: { lat: number; lng: number }, address: string) => {
+    if (!locationTicket) return;
+    const patched: TicketObject = {
+      ...locationTicket,
+      metadata: { ...locationTicket.metadata, lat: coords.lat, lng: coords.lng, location: address },
+    };
+    setLocationTicket(null);
+    setPendingChange({ ticket: patched, nextStatus: "in_progress" });
+  };
+
+  const handleLocationSkip = () => {
+    if (!locationTicket) return;
+    const ticket = locationTicket;
+    setLocationTicket(null);
+    setPendingChange({ ticket, nextStatus: "in_progress" });
   };
 
   const confirmStatusChange = async () => {
@@ -180,7 +201,7 @@ export function IssueDashboard({
 
     setDetailTicket(null);
 
-    toast.push(`Issue marked as ${STATUS_LABEL[nextStatus].toLowerCase()}`);
+    toast.push(`Problem označen kao ${STATUS_LABEL[nextStatus].toLowerCase()}`);
     setPendingChange(null);
   };
 
@@ -209,8 +230,8 @@ export function IssueDashboard({
             leftIcon={<Icon name="plus" />}
             onClick={() => setReportOpen(true)}
           >
-            <span className="hidden sm:inline">Report Issue</span>
-            <span className="sm:hidden">Report</span>
+            <span className="hidden sm:inline">Prijavi problem</span>
+            <span className="sm:hidden">Prijavi</span>
           </Button>
         }
       />
@@ -244,6 +265,13 @@ export function IssueDashboard({
         ticket={detailTicket}
         onClose={() => setDetailTicket(null)}
         onChangeStatus={handleStatusChange}
+      />
+
+      <LocationPickerModal
+        open={locationTicket !== null}
+        onDismiss={() => setLocationTicket(null)}
+        onConfirm={handleLocationConfirm}
+        onSkip={handleLocationSkip}
       />
 
       <ConfirmActionModal
