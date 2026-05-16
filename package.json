@@ -14,14 +14,17 @@
     "db:studio": "node scripts/prisma.mjs studio",
     "db:reset": "node scripts/prisma.mjs migrate reset",
     "db:generate": "node scripts/prisma.mjs generate",
+    "test:rss": "tsx scripts/test-rss-ingestion.ts",
     "db:seed": "tsx scripts/seed.ts"
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",
+    "dotenv": "^17.4.2",
     "next": "16.2.6",
     "prisma": "^5.22.0",
     "react": "19.2.4",
     "react-dom": "19.2.4",
+    "rss-parser": "^3.13.0",
     "zod": "^4.4.3"
   },
   "devDependencies": {
@@ -29,11 +32,10 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "dotenv": "^17.4.2",
     "eslint": "^9",
     "eslint-config-next": "16.2.6",
     "tailwindcss": "^4",
-    "tsx": "^4.19.2",
+    "tsx": "^4.22.0",
     "typescript": "^5"
   }
 }
