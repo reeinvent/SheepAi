@@ -17,7 +17,7 @@ Generate the title yourself. Croatian is the primary language.
 
 ### Mechanics
 
-- No LLM SDK is wired up — the categorization is performed by the assistant reading summaries and grouping them by hand. Don't try to call OpenAI/Anthropic from code.
+- No LLM SDK is wired up. The flow is: a script dumps state to JSON, the assistant categorizes by hand, a second script writes decisions back. Don't add an OpenAI/Anthropic call inside either script.
 - Raw inputs are commonly scraped twice (e.g. once via `#split` and once via `@split`) for the same upstream `postId`. Group by `metadata.postId` first so duplicate scrapes land on the same ticket.
 - Beyond same-postId dedup, look for **semantic duplicates**: different `postId`s, different authors, sometimes different languages, but describing the same physical incident at the same location (e.g. two residents complaining about the same flickering streetlight on Šperun). These must be merged into one ticket. The mock data in `src/ingestion/X/mockXIngestor.ts` intentionally contains a few such pairs (Šperun light, Velebitska manhole, Šuma Marjan lamp); if the categorization produces a ticket-per-post here, the matching step is broken.
 - Existing seeded tickets are often city-wide/generic ("Parking problem u centru Splita"). Specific incidents at specific locations (e.g. parking blocking a particular health center) are usually **new** tickets, not appends. Append only when the input describes the same physical problem at the same location as an existing ticket.
@@ -27,16 +27,33 @@ Generate the title yourself. Croatian is the primary language.
 
 ### Workflow
 
+The mechanics live in two reusable scripts. The assistant's only job between them is producing `decisions.json`.
+
 1. If `prisma/schema.prisma` has new fields not yet migrated, run `npm run db:migrate -- --name <name>` first. The Prisma client is regenerated automatically.
-2. Write a throwaway script under `scripts/` (e.g. `scripts/_categorizer-run.ts`) that:
-   - Loads all `RawIngestorOutput` with `processedAt = null`, ordered by `timestamp asc`.
-   - Loads non-closed `Ticket` rows.
-   - Wraps creates + updates in a single `prisma.$transaction` so a crash mid-batch doesn't leave half-processed state.
-   - For each new ticket, calls `prisma.ticket.create` then `prisma.rawIngestorOutput.updateMany({ where: { id: { in: rawIds } }, data: { ticketId, processedAt: now } })`.
-   - For appends to an existing ticket, just runs the `updateMany` against the existing `ticketId`.
-3. Run with `npx tsx scripts/_categorizer-run.ts`. Prisma query logs are noisy — pipe through `grep -v "^prisma:query"`.
-4. Verify `stillUnprocessed === 0` and that each new ticket has the expected `rawOutputs.length`.
-5. Delete the throwaway script when done — this is a one-off task, not a service.
+2. **Export current state.** Run `npm run categorize:export`. This writes:
+   - `data/categorizer/raw-inputs.json` — all `RawIngestorOutput` with `processedAt = null`, ordered by `timestamp asc`.
+   - `data/categorizer/tickets.json` — all non-closed tickets with their existing `rawOutputs` so you can see what each one already covers.
+   Pass a different output directory as the first argument if needed: `npm run categorize:export -- path/to/dir`.
+3. **Categorize by hand.** Read both files. Apply the dedup, category, and priority rules above. Produce `data/categorizer/decisions.json` with this shape:
+   ```json
+   {
+     "newTickets": [
+       {
+         "title": "Croatian title",
+         "description": "Croatian description (optional)",
+         "priority": "low|medium|high|critical",
+         "categories": ["SANITATION"],
+         "rawInputIds": ["raw_id_1", "raw_id_2"]
+       }
+     ],
+     "appends": [
+       { "ticketId": "existing_ticket_id", "rawInputIds": ["raw_id_3"] }
+     ]
+   }
+   ```
+   Every unprocessed raw input you intend to handle in this batch must appear in exactly one entry — either under `newTickets[].rawInputIds` or `appends[].rawInputIds`. New tickets are created with the schema default `status = 'pending_approval'`; the apply step never touches the status of existing tickets.
+4. **Apply.** Run `npm run categorize:apply` (or `npm run categorize:apply -- path/to/decisions.json` for a non-default path). The script validates the file with zod, wraps everything in a single `prisma.$transaction`, creates tickets, and sets `ticketId` + `processedAt` on each raw input. It refuses to run if a raw id is unknown, already processed, referenced twice, or if an append targets a closed ticket.
+5. **Verify.** The apply step prints `created N new ticket(s)`, `attached N raw input(s)`, and `still unprocessed: N`. Confirm `still unprocessed` matches what you intentionally left out of this batch (usually `0`), and spot-check that each new ticket has the expected `rawOutputs.length` in the DB.
 
 ### Determining ticket category
 
@@ -51,7 +68,8 @@ UNCATEGORIZED - only if it does not fall under the rest.
 
 ### What NOT to do
 
-- Don't write a reusable `scripts/categorize.ts` and leave it in the repo. There is no LLM call to automate; the judgment lives in the assistant.
+- Don't add an LLM call inside `categorize-export.ts` or `categorize-apply.ts`. The judgment lives in the assistant; the scripts only move JSON in and out of the database.
+- Don't write yet another throwaway script in `scripts/` — extend the two reusable ones if mechanics need to change.
 - Don't touch the migrations folder beyond running `db:migrate` for schema changes already made by the user.
-- Don't change ticket statuses on existing tickets when appending — only set `ticketId` and `processedAt` on the raw inputs.
+- Don't change ticket statuses on existing tickets when appending — only `ticketId` and `processedAt` on the raw inputs are touched.
 - Don't use `prisma.$executeRaw` to work around a stale client. Run the migration instead.

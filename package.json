@@ -15,7 +15,9 @@
     "db:reset": "node scripts/prisma.mjs migrate reset",
     "db:generate": "node scripts/prisma.mjs generate",
     "test:rss": "tsx scripts/test-rss-ingestion.ts",
-    "db:seed": "tsx scripts/seed.ts"
+    "db:seed": "tsx scripts/seed.ts",
+    "categorize:export": "tsx scripts/categorize-export.ts",
+    "categorize:apply": "tsx scripts/categorize-apply.ts"
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",
