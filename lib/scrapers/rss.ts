@@ -30,21 +30,17 @@ interface Source {
 // Only keep articles published within this many days. Since the ingestor
 // runs every 12 h we only need recent content; deep archive adds cost with
 // no benefit and makes each run much slower.
-const MAX_AGE_DAYS = 10;
+const MAX_AGE_DAYS = 3;
 
 const SOURCES: Source[] = [
   {
     name: "Slobodna Dalmacija",
-    // Split-section feed — avoids the 403 on the generic /feed endpoint
-    // and is already scoped to Split city news so no word-match needed.
-    feed: "https://slobodnadalmacija.hr/split-i-zupanija/feed",
-    splitFeed: true,
+    feed: "https://slobodnadalmacija.hr/feed",
+    splitFeed: false,
     maxPages: 50,
   },
   {
     name: "Morski.hr",
-    // Split-based nautical/coastal publication — all content is relevant
-    // to the Split area so no word-match needed.
     feed: "https://www.morski.hr/rss/",
     splitFeed: false,
     maxPages: 50,
@@ -100,7 +96,7 @@ export async function scrapeAllSources(): Promise<{
     const description = rawDescription.trim();
     const combined = title + " " + description;
 
-    if (!source.splitFeed && !normalizeCroatian(title).includes("split") && !normalizeCroatian(description).includes("split")) return;
+    if (!source.splitFeed && !normalizeCroatian(combined).includes("split")) return;
 
     const hits = matchedKeywords(combined);
     if (hits.length === 0) return;
