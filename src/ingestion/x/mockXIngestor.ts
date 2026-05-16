@@ -54,7 +54,7 @@ export interface MockXIngestorOptions {
   now?: () => Date;
 }
 
-const DEFAULT_MOCK_INTERVAL_MS = 5 * 60 * 1000;
+const DEFAULT_MOCK_INTERVAL_MS = 10 * 60 * 1000;
 
 const X_LLM_INSTRUCTIONS = `# X (Twitter) ingestion — LLM stage instructions
 
@@ -168,7 +168,12 @@ const RELEVANT_POSTS_BY_TAG: Record<string, PostTemplate[]> = {
       ageMinutes: 42,
       lang: "hr",
       extraHashtags: ["rasvjeta"],
-      metrics: { retweet_count: 2, reply_count: 4, like_count: 18, quote_count: 0 },
+      metrics: {
+        retweet_count: 2,
+        reply_count: 4,
+        like_count: 18,
+        quote_count: 0,
+      },
     },
     {
       text: "Šaht na križanju Domovinskog rata i Poljičke propao je, auto mi je skoro upao u rupu. Hitno popraviti prije nego se netko ozlijedi! #split",
@@ -179,7 +184,12 @@ const RELEVANT_POSTS_BY_TAG: Record<string, PostTemplate[]> = {
       lang: "hr",
       extraHashtags: ["sahtovi", "ceste"],
       urls: ["https://twitter.com/tomislav_s/status/{tweetId}/photo/1"],
-      metrics: { retweet_count: 11, reply_count: 7, like_count: 34, quote_count: 1 },
+      metrics: {
+        retweet_count: 11,
+        reply_count: 7,
+        like_count: 34,
+        quote_count: 1,
+      },
     },
     {
       text: "Opet auto parkiran na pješačkom prijelazu kod Pazara. Kolica s djetetom moram gurat na cestu. Komunalci gdje ste? #split",
@@ -189,7 +199,12 @@ const RELEVANT_POSTS_BY_TAG: Record<string, PostTemplate[]> = {
       ageMinutes: 18,
       lang: "hr",
       extraHashtags: ["nepropisno_parkiranje"],
-      metrics: { retweet_count: 5, reply_count: 12, like_count: 47, quote_count: 2 },
+      metrics: {
+        retweet_count: 5,
+        reply_count: 12,
+        like_count: 47,
+        quote_count: 2,
+      },
     },
     {
       text: "Na Žnjanu navečer pola ulične rasvjete ne radi, šetnja je postala doslovno avantura. Treba li čekat ljeto pa da neko reagira? #split",
@@ -199,7 +214,12 @@ const RELEVANT_POSTS_BY_TAG: Record<string, PostTemplate[]> = {
       ageMinutes: 220,
       lang: "hr",
       extraHashtags: ["rasvjeta", "znjan"],
-      metrics: { retweet_count: 3, reply_count: 2, like_count: 21, quote_count: 0 },
+      metrics: {
+        retweet_count: 3,
+        reply_count: 2,
+        like_count: 21,
+        quote_count: 0,
+      },
     },
     {
       text: "Stanari Spinuta već treći tjedan ne mogu naći parking jer su parkirališta zatvorena bez ikakve obavijesti. Što se događa? #split",
@@ -209,7 +229,12 @@ const RELEVANT_POSTS_BY_TAG: Record<string, PostTemplate[]> = {
       ageMinutes: 360,
       lang: "hr",
       extraHashtags: ["parking", "spinut"],
-      metrics: { retweet_count: 8, reply_count: 9, like_count: 29, quote_count: 1 },
+      metrics: {
+        retweet_count: 8,
+        reply_count: 9,
+        like_count: 29,
+        quote_count: 1,
+      },
     },
     {
       text: "Manhole cover missing on Ulica kralja Tomislava right by the bus stop. Tourist almost stepped into it last night. Please fix asap. #split",
@@ -220,7 +245,12 @@ const RELEVANT_POSTS_BY_TAG: Record<string, PostTemplate[]> = {
       lang: "en",
       extraHashtags: ["safety"],
       urls: ["https://twitter.com/split_visitor/status/{tweetId}/photo/1"],
-      metrics: { retweet_count: 4, reply_count: 3, like_count: 15, quote_count: 0 },
+      metrics: {
+        retweet_count: 4,
+        reply_count: 3,
+        like_count: 15,
+        quote_count: 0,
+      },
     },
   ],
   "@split": [
@@ -232,7 +262,12 @@ const RELEVANT_POSTS_BY_TAG: Record<string, PostTemplate[]> = {
       ageMinutes: 28,
       lang: "hr",
       extraHashtags: ["rasvjeta", "bacvice"],
-      metrics: { retweet_count: 1, reply_count: 5, like_count: 22, quote_count: 0 },
+      metrics: {
+        retweet_count: 1,
+        reply_count: 5,
+        like_count: 22,
+        quote_count: 0,
+      },
     },
     {
       text: "@split kombi već 4 dana parkiran na invalidskom mjestu ispred Joker centra. Nitko ne reagira. Tablica na slici.",
@@ -243,7 +278,12 @@ const RELEVANT_POSTS_BY_TAG: Record<string, PostTemplate[]> = {
       lang: "hr",
       extraHashtags: ["nepropisno_parkiranje", "invalidsko"],
       urls: ["https://twitter.com/joker_susjed/status/{tweetId}/photo/1"],
-      metrics: { retweet_count: 14, reply_count: 11, like_count: 63, quote_count: 3 },
+      metrics: {
+        retweet_count: 14,
+        reply_count: 11,
+        like_count: 63,
+        quote_count: 3,
+      },
     },
     {
       text: "@split kad ćete riješit parking na Mejašima? Ljudi parkiraju po travnjacima jer doslovno nema mjesta navečer.",
@@ -253,7 +293,12 @@ const RELEVANT_POSTS_BY_TAG: Record<string, PostTemplate[]> = {
       ageMinutes: 280,
       lang: "hr",
       extraHashtags: ["parking", "mejasi"],
-      metrics: { retweet_count: 6, reply_count: 8, like_count: 31, quote_count: 1 },
+      metrics: {
+        retweet_count: 6,
+        reply_count: 8,
+        like_count: 31,
+        quote_count: 1,
+      },
     },
     {
       text: "@split šaht u Velebitskoj propao i opet je samo stavljen kup s narandzastim čunjevima. Drugi tjedan tako. Hoće li se ikad popraviti?",
@@ -263,7 +308,12 @@ const RELEVANT_POSTS_BY_TAG: Record<string, PostTemplate[]> = {
       ageMinutes: 55,
       lang: "hr",
       extraHashtags: ["sahtovi"],
-      metrics: { retweet_count: 9, reply_count: 6, like_count: 27, quote_count: 0 },
+      metrics: {
+        retweet_count: 9,
+        reply_count: 6,
+        like_count: 27,
+        quote_count: 0,
+      },
     },
     {
       text: "@split parking ispred Doma zdravlja na Visokoj je pun auta s neistaknutim oznakama, stariji ljudi ne mogu doć do ulaza.",
@@ -273,7 +323,12 @@ const RELEVANT_POSTS_BY_TAG: Record<string, PostTemplate[]> = {
       ageMinutes: 410,
       lang: "hr",
       extraHashtags: ["nepropisno_parkiranje", "parking"],
-      metrics: { retweet_count: 7, reply_count: 4, like_count: 19, quote_count: 1 },
+      metrics: {
+        retweet_count: 7,
+        reply_count: 4,
+        like_count: 19,
+        quote_count: 1,
+      },
     },
     {
       text: "@split street light on Šperun has been flickering for three weeks. Whole alley goes dark at random. Tourists keep bumping into bins.",
@@ -283,7 +338,12 @@ const RELEVANT_POSTS_BY_TAG: Record<string, PostTemplate[]> = {
       ageMinutes: 165,
       lang: "en",
       extraHashtags: ["rasvjeta", "starigrad"],
-      metrics: { retweet_count: 2, reply_count: 1, like_count: 12, quote_count: 0 },
+      metrics: {
+        retweet_count: 2,
+        reply_count: 1,
+        like_count: 12,
+        quote_count: 0,
+      },
     },
   ],
 };
@@ -302,7 +362,12 @@ const NOISE_POSTS_BY_TAG: Record<string, PostTemplate[]> = {
       ageMinutes: 65,
       lang: "en",
       extraHashtags: ["travel", "croatia", "sunset"],
-      metrics: { retweet_count: 18, reply_count: 4, like_count: 142, quote_count: 2 },
+      metrics: {
+        retweet_count: 18,
+        reply_count: 4,
+        like_count: 142,
+        quote_count: 2,
+      },
     },
     {
       text: "Hajduk večeras na Poljudu, tko ide?! Karte još ima na blagajni 💙 #split #hajduk",
@@ -312,7 +377,12 @@ const NOISE_POSTS_BY_TAG: Record<string, PostTemplate[]> = {
       ageMinutes: 200,
       lang: "hr",
       extraHashtags: ["hajduk", "nogomet"],
-      metrics: { retweet_count: 24, reply_count: 11, like_count: 89, quote_count: 5 },
+      metrics: {
+        retweet_count: 24,
+        reply_count: 11,
+        like_count: 89,
+        quote_count: 5,
+      },
     },
     {
       text: "Wordle 1247 — got it in 3, today's word had me split between two guesses 🧠 #split #wordle",
@@ -322,7 +392,12 @@ const NOISE_POSTS_BY_TAG: Record<string, PostTemplate[]> = {
       ageMinutes: 320,
       lang: "en",
       extraHashtags: ["wordle"],
-      metrics: { retweet_count: 0, reply_count: 1, like_count: 7, quote_count: 0 },
+      metrics: {
+        retweet_count: 0,
+        reply_count: 1,
+        like_count: 7,
+        quote_count: 0,
+      },
     },
     {
       text: "Banana split za doručak, ne kajem se 🍌🍦 ko sa mnom? #split",
@@ -332,7 +407,12 @@ const NOISE_POSTS_BY_TAG: Record<string, PostTemplate[]> = {
       ageMinutes: 480,
       lang: "hr",
       extraHashtags: ["dessert", "food"],
-      metrics: { retweet_count: 1, reply_count: 6, like_count: 33, quote_count: 0 },
+      metrics: {
+        retweet_count: 1,
+        reply_count: 6,
+        like_count: 33,
+        quote_count: 0,
+      },
     },
   ],
   "@split": [
@@ -343,7 +423,12 @@ const NOISE_POSTS_BY_TAG: Record<string, PostTemplate[]> = {
       authorId: "1972648305",
       ageMinutes: 90,
       lang: "en",
-      metrics: { retweet_count: 0, reply_count: 12, like_count: 4, quote_count: 0 },
+      metrics: {
+        retweet_count: 0,
+        reply_count: 12,
+        like_count: 4,
+        quote_count: 0,
+      },
     },
     {
       text: "@split sunset cruise yesterday with @dalmatia_sails was incredible, captain Toni je legenda ⛵️🌅",
@@ -354,7 +439,12 @@ const NOISE_POSTS_BY_TAG: Record<string, PostTemplate[]> = {
       lang: "en",
       extraMentions: ["dalmatia_sails"],
       extraHashtags: ["travel", "sailing"],
-      metrics: { retweet_count: 3, reply_count: 2, like_count: 41, quote_count: 0 },
+      metrics: {
+        retweet_count: 3,
+        reply_count: 2,
+        like_count: 41,
+        quote_count: 0,
+      },
     },
     {
       text: "@split koji je najbolji burek u gradu? Stigli smo jučer i moramo isprobat sve 🥟",
@@ -364,7 +454,12 @@ const NOISE_POSTS_BY_TAG: Record<string, PostTemplate[]> = {
       ageMinutes: 150,
       lang: "hr",
       extraHashtags: ["foodie", "burek"],
-      metrics: { retweet_count: 2, reply_count: 27, like_count: 38, quote_count: 1 },
+      metrics: {
+        retweet_count: 2,
+        reply_count: 27,
+        like_count: 38,
+        quote_count: 1,
+      },
     },
     {
       text: "@split debugging a string.split() infinite loop at 2am, send help 😩 #devlife",
@@ -374,13 +469,19 @@ const NOISE_POSTS_BY_TAG: Record<string, PostTemplate[]> = {
       ageMinutes: 12,
       lang: "en",
       extraHashtags: ["devlife", "javascript"],
-      metrics: { retweet_count: 0, reply_count: 3, like_count: 11, quote_count: 0 },
+      metrics: {
+        retweet_count: 0,
+        reply_count: 3,
+        like_count: 11,
+        quote_count: 0,
+      },
     },
   ],
 };
 
 function buildMockPosts(tag: string, now: Date): XPost[] {
-  const relevant = RELEVANT_POSTS_BY_TAG[tag] ?? RELEVANT_POSTS_BY_TAG["#split"];
+  const relevant =
+    RELEVANT_POSTS_BY_TAG[tag] ?? RELEVANT_POSTS_BY_TAG["#split"];
   const noise = NOISE_POSTS_BY_TAG[tag] ?? [];
   // Interleave so the LLM filter sees a mix, not a clean front-loaded
   // section of relevant posts followed by all the noise.
@@ -398,7 +499,12 @@ function interleave<T>(a: T[], b: T[]): T[] {
   return out;
 }
 
-function makePost(tag: string, tpl: PostTemplate, index: number, now: Date): XPost {
+function makePost(
+  tag: string,
+  tpl: PostTemplate,
+  index: number,
+  now: Date,
+): XPost {
   // Real X timestamps are second-precision (e.g. "2026-05-16T10:14:23.000Z").
   // toISOString() defaults to millisecond precision, so zero the ms first.
   const created = new Date(now.getTime() - tpl.ageMinutes * 60_000);
