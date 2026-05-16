@@ -1,8 +1,9 @@
 import { config } from 'dotenv'
 import { PrismaClient } from '@prisma/client'
 
-// Load environment variables
-config()
+// override:true so this project's DATABASE_URL wins over any value already
+// present in the shell (e.g. a Postgres URL exported for a different project).
+config({ override: true })
 
 const globalForPrisma = global as unknown as { prisma: PrismaClient }
 
