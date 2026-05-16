@@ -8,6 +8,13 @@ import {
   type TicketStatus,
 } from "@/app/lib/issues/types";
 
+const CATEGORY_LABEL: Record<string, string> = {
+  "CITY-ADMIN": "Gradska uprava",
+  ELECTRICITY: "Struja i rasvjeta",
+  SANITATION: "Čistoća i otpad",
+  WATERSUPPLY: "Vodoopskrba",
+};
+
 const STATUS_TONE: Record<TicketStatus, BadgeTone> = {
   pending_approval: "amber",
   open: "blue",
@@ -65,7 +72,7 @@ export function CommunityTicketCard({
         <div>
           {meta.category && (
             <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-slate-100 text-slate-600">
-              {meta.category}
+              {CATEGORY_LABEL[meta.category] ?? meta.category}
             </span>
           )}
         </div>

@@ -22,11 +22,7 @@ const EMPTY: FormState = {
   body: "",
 };
 
-export function IssueReportModal({
-  open,
-  onClose,
-  onSubmit,
-}: IssueReportModalProps) {
+export function IssueReportModal({ open, onClose, onSubmit }: IssueReportModalProps) {
   const [form, setForm] = useState<FormState>(EMPTY);
   const [submitting, setSubmitting] = useState(false);
 
@@ -51,30 +47,39 @@ export function IssueReportModal({
   };
 
   return (
-    <Modal open={open} onClose={handleClose} title="Prijavi novi problem">
-      <form onSubmit={handleSubmit} className="space-y-3">
-        <Field label="Naslov" htmlFor="inp-title">
+    <Modal
+      open={open}
+      onClose={handleClose}
+      title="Prijavi novi problem"
+    >
+      <form
+        onSubmit={handleSubmit}
+        className="space-y-3"
+      >
+        <Field
+          label="Naslov"
+          htmlFor="inp-title"
+        >
           <TextInput
             id="inp-title"
             required
             value={form.title}
-            placeholder="e.g. Pothole on the Riva"
-            onChange={(e) =>
-              setForm((f) => ({ ...f, title: e.target.value }))
-            }
+            placeholder="e.g. Oštećen kolnik u Dubrovačkoj ulici"
+            onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
           />
         </Field>
 
-        <Field label="Opis" htmlFor="inp-body">
+        <Field
+          label="Opis"
+          htmlFor="inp-body"
+        >
           <TextArea
             id="inp-body"
             required
             rows={3}
             value={form.body}
             placeholder="Opišite problem..."
-            onChange={(e) =>
-              setForm((f) => ({ ...f, body: e.target.value }))
-            }
+            onChange={(e) => setForm((f) => ({ ...f, body: e.target.value }))}
           />
         </Field>
 
