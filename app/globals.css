@@ -7,8 +7,12 @@
   --color-surface-muted: #f8fafc;
   --color-border-subtle: #e2e8f0;
 
-  --color-brand: #059669;
-  --color-brand-hover: #047857;
+  /* Adriatic palette — Split / Dalmatia */
+  --color-brand: #0e7490; /* cyan-700 — Adriatic */
+  --color-brand-hover: #155e75; /* cyan-800 */
+  --color-brand-soft: #ecfeff; /* cyan-50 — sea foam */
+  --color-accent: #f97316; /* orange-500 — sunset / coral */
+  --color-accent-soft: #fff7ed; /* orange-50 — limestone */
 }
 
 :root {

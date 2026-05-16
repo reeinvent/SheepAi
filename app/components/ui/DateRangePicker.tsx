@@ -113,7 +113,7 @@ export function DateRangePicker({ value, onChange }: DateRangePickerProps) {
         aria-expanded={open}
         className={`flex items-center gap-2 px-3 py-2 border rounded-lg text-sm transition-colors ${
           hasRange
-            ? "border-emerald-500 bg-emerald-50 text-emerald-800 hover:bg-emerald-100"
+            ? "border-cyan-600 bg-cyan-50 text-cyan-800 hover:bg-cyan-100"
             : "border-slate-300 text-slate-700 hover:bg-slate-50"
         }`}
       >
@@ -145,7 +145,7 @@ export function DateRangePicker({ value, onChange }: DateRangePickerProps) {
             <button
               type="button"
               onClick={() => setOpen(false)}
-              className="text-sm font-medium text-emerald-700 hover:text-emerald-800"
+              className="text-sm font-medium text-cyan-700 hover:text-cyan-800"
             >
               Done
             </button>
@@ -245,9 +245,9 @@ function CalendarGrid({
         let cls =
           "h-8 w-full inline-flex items-center justify-center text-sm rounded-md transition-colors ";
         if (isFrom || isTo) {
-          cls += "bg-emerald-600 text-white font-semibold hover:bg-emerald-700";
+          cls += "bg-cyan-700 text-white font-semibold hover:bg-cyan-800";
         } else if (inRange) {
-          cls += "bg-emerald-50 text-emerald-700";
+          cls += "bg-cyan-50 text-cyan-700";
         } else if (isToday) {
           cls += "text-slate-800 ring-1 ring-slate-300 hover:bg-slate-100";
         } else {

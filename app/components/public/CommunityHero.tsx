@@ -14,14 +14,14 @@ export function CommunityHero({
   action,
 }: CommunityHeroProps) {
   return (
-    <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-600 via-emerald-500 to-teal-500 px-6 sm:px-10 py-8 sm:py-10 mb-8 shadow-xl shadow-emerald-500/20">
+    <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-cyan-700 via-teal-600 to-cyan-500 px-6 sm:px-10 py-8 sm:py-10 mb-8 shadow-xl shadow-cyan-700/20">
       <div
         aria-hidden
-        className="absolute -top-16 -right-16 w-64 h-64 rounded-full bg-white/10 blur-2xl"
+        className="absolute -top-16 -right-16 w-64 h-64 rounded-full bg-orange-300/25 blur-2xl"
       />
       <div
         aria-hidden
-        className="absolute -bottom-20 -left-10 w-72 h-72 rounded-full bg-teal-300/20 blur-3xl"
+        className="absolute -bottom-20 -left-10 w-72 h-72 rounded-full bg-cyan-200/30 blur-3xl"
       />
       <div className="relative flex items-end justify-between gap-4 flex-wrap">
         <div className="text-white max-w-xl">
@@ -31,7 +31,7 @@ export function CommunityHero({
           <h1 className="text-3xl sm:text-4xl font-bold tracking-tight">
             {title}
           </h1>
-          <p className="text-sm sm:text-base text-emerald-50/90 mt-2">
+          <p className="text-sm sm:text-base text-cyan-50/90 mt-2">
             {description}
           </p>
         </div>

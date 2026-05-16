@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { Logo } from "./public/Logo";
 import {
   Sidebar,
   SidebarProvider,
@@ -17,12 +18,10 @@ const DEFAULT_NAV: SidebarNavItem[] = [
 function Brand() {
   return (
     <div className="flex items-center gap-2.5">
-      <div className="w-9 h-9 rounded-lg bg-emerald-600 flex items-center justify-center text-white font-bold">
-        S
-      </div>
+      <Logo size={36} />
       <div className="min-w-0">
-        <p className="font-bold text-slate-800 truncate">SheepAi</p>
-        <p className="text-xs text-slate-500 truncate">City Issue Tracker</p>
+        <p className="font-bold text-slate-800 truncate">Peristil</p>
+        <p className="text-xs text-slate-500 truncate">Split issue tracker</p>
       </div>
     </div>
   );

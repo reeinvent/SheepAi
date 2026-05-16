@@ -9,8 +9,8 @@ const dmSans = DM_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Beeeeee — City Issue Tracker",
-  description: "Community-powered city issue reporting",
+  title: "Peristil — Split City Issue Tracker",
+  description: "Community-powered issue reporting for the city of Split",
 };
 
 export default function RootLayout({

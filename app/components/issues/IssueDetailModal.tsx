@@ -59,11 +59,9 @@ export function IssueDetailModal({
   const forwardStatus = getForwardStatus(ticket.status);
   const forwardAction = FORWARD_ACTION[ticket.status];
 
-  const footer = isTerminalStatus(ticket.status) ? (
-    <Button variant="outline" className="flex-1" onClick={onClose}>
-      Close
-    </Button>
-  ) : (
+  const canTransition = Boolean(onChangeStatus) && !isTerminalStatus(ticket.status);
+
+  const footer = canTransition ? (
     <>
       {forwardStatus && forwardAction && (
         <Button
@@ -86,6 +84,10 @@ export function IssueDetailModal({
         </Button>
       )}
     </>
+  ) : (
+    <Button variant="outline" className="flex-1" onClick={onClose}>
+      Close
+    </Button>
   );
 
   return (

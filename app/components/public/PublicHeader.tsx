@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Icon } from "../ui/Icon";
+import { Logo } from "./Logo";
 
 export function PublicHeader() {
   return (
@@ -8,19 +9,20 @@ export function PublicHeader() {
         <Link
           href="/community"
           aria-current="page"
-          className="flex items-center gap-2 group"
+          className="flex items-center gap-2.5 group"
         >
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-700 text-white flex items-center justify-center font-bold shadow-md shadow-emerald-500/30 group-hover:shadow-lg group-hover:shadow-emerald-500/40 transition-all">
-            B
-          </div>
-          <span className="text-lg font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
-            Beeeeee
+          <Logo
+            size={36}
+            className="shadow-md shadow-cyan-700/30 rounded-[7px] group-hover:shadow-lg group-hover:shadow-cyan-700/40 transition-shadow"
+          />
+          <span className="text-lg font-bold bg-gradient-to-r from-cyan-800 to-teal-700 bg-clip-text text-transparent">
+            Peristil
           </span>
         </Link>
         <button
           type="button"
           aria-label="Sign in"
-          className="p-2 text-slate-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg transition-colors"
+          className="p-2 text-slate-600 hover:text-cyan-700 hover:bg-cyan-50 rounded-lg transition-colors"
         >
           <Icon name="user" size={20} />
         </button>

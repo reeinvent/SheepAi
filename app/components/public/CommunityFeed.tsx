@@ -82,7 +82,7 @@ export function CommunityFeed({ initialTickets }: CommunityFeedProps) {
           <button
             type="button"
             onClick={() => setReportOpen(true)}
-            className="inline-flex items-center justify-center gap-2 rounded-md text-sm font-semibold h-9 px-4 py-2 bg-white text-emerald-700 shadow-md hover:bg-emerald-50 transition-colors"
+            className="inline-flex items-center justify-center gap-2 rounded-md text-sm font-semibold h-9 px-4 py-2 bg-white text-cyan-700 shadow-md hover:bg-cyan-50 transition-colors"
           >
             <Icon name="plus" size={16} />
             Report an issue
@@ -111,7 +111,6 @@ export function CommunityFeed({ initialTickets }: CommunityFeedProps) {
         open={reportOpen}
         onClose={() => setReportOpen(false)}
         onSubmit={handleSubmit}
-        hidePriority
       />
 
       <IssueDetailModal
