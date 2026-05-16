@@ -47,6 +47,7 @@ model Ticket {
   categories    String
   lat           Float?
   lon           Float?
+  location      String?
 
   // Relationship to RawIngestorOutput
   rawOutputs    RawIngestorOutput[]

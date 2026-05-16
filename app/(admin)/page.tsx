@@ -1,6 +1,9 @@
 import { IssueDashboard } from "@/app/components/issues/IssueDashboard";
-import { MOCK_TICKETS } from "@/app/lib/issues/mock";
+import { getAllTickets } from "@/app/lib/actions/ticketActions";
+import { dbTicketToTicketObject } from "@/app/lib/issues/mappers";
 
-export default function AdminHome() {
-  return <IssueDashboard initialTickets={MOCK_TICKETS} />;
+export default async function AdminHome() {
+  const dbTickets = await getAllTickets();
+  const tickets = dbTickets.map(dbTicketToTicketObject);
+  return <IssueDashboard initialTickets={tickets} />;
 }
