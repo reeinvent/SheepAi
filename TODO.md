@@ -1,0 +1,4 @@
+- decide on a stack (probably Next)
+- set up testing tools (vitest?)
+- set up on-push hooks that run the test suite
+- set up agent task manager integration (Jira?)

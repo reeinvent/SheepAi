@@ -137,3 +137,62 @@ The assistant implements code **in this repo**; Issues stay the **coordination**
 | Link PR to issue | Put `Closes #<n>` or `Fixes #<n>` in PR description |
 
 Questions or improvements: open a GitHub issue or propose a PR.
+
+---
+
+## Hackathon context
+
+This project is being developed at a hackathon by a team of 4–6 devs working in parallel on feature branches with no review before merge. Speed matters, but so does keeping `main` demoable. The rules below exist to make parallel work safe and the demo reliable.
+
+## Modularity & file ownership
+
+- Default to creating new files over editing shared ones. Each feature/page/component goes in its own file.
+- Treat as "shared, ask before touching":
+  - Router / route config
+  - Top-level layout / app shell
+  - Global state / context providers
+  - Schema and shared types files
+  - `package.json` / lockfiles
+  - Env config, build config, CI config
+- No "utils.ts" dumping ground. One util per file, or grouped by domain.
+- Do not restructure folder layout once parallel work has started — it causes massive conflicts.
+
+## Tests
+
+- Cover the main functionality with unit tests. Test pure functions and critical business logic.
+- Skip tests for trivial wrappers, UI rendering, and one-shot demo glue.
+- Hard cap: full test suite under 30 seconds. If it gets slower, cut tests rather than optimize.
+- Do not mock internal modules — they rot fast in a hackathon.
+- Do not write edge-case tests for things that don't have high user impact.
+
+## Git hygiene
+
+- Branch naming: `<initials>/<short-feature>` so conflicts are easy to attribute.
+- Pull `main` before starting work AND before merging back. Always.
+- Commit often, push often. Small commits recover from conflicts more easily than big ones.
+- Never force-push to `main`. Never rewrite history on a branch someone else may have pulled.
+
+## Secrets & env vars
+
+- Never commit `.env*` files. Only `.env.example` with placeholder values is allowed.
+- All secrets via env vars, read at runtime. No hardcoded keys, even temporarily.
+- When adding a new env var, update `.env.example` in the same commit.
+
+## Demo readiness
+
+- `main` must always build and run. If your merge breaks `main`, fix it immediately or revert — do not keep working on top of a broken main.
+- Use feature flags or unmounted routes for in-progress work that touches shared paths.
+- Seed or mock data for anything that requires login, payment, or external services so the demo does not depend on network conditions on stage.
+
+## Scope discipline
+
+- Build exactly what is asked. No refactoring adjacent code, no "while I'm here" cleanup, no speculative abstractions.
+- No new dependencies without team sign-off — they slow installs and cause lockfile conflicts.
+- If a task seems to require a major architectural change, stop and ask.
+
+## When to stop and ask the human
+
+- Touching any file listed under "shared, ask before touching".
+- Adding a dependency.
+- Changing an API shape that another feature consumes.
+- Anything that requires `main` to be temporarily broken.
