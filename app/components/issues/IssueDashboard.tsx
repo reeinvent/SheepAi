@@ -14,6 +14,10 @@ import { IssueReportModal } from "./IssueReportModal";
 import { IssueStats } from "./IssueStats";
 import { PageHeader } from "./PageHeader";
 import { STATUS_LABEL } from "./StatusBadge";
+import {
+  getForwardStatus,
+  isValidStatusTransition,
+} from "@/app/lib/issues/statusTransitions";
 import type {
   IssueDraft,
   IssueFilter,
@@ -64,14 +68,6 @@ const STATUS_ACTION: Record<
     variant: "danger",
     message: "Reject this issue?",
   },
-};
-
-const STATUS_CYCLE: Record<TicketStatus, TicketStatus> = {
-  pending_approval: "open",
-  open: "in_progress",
-  in_progress: "resolved",
-  resolved: "pending_approval",
-  rejected: "pending_approval",
 };
 
 function nextId(tickets: TicketObject[]): string {
@@ -153,6 +149,7 @@ export function IssueDashboard({
     nextStatus: TicketStatus,
   ) => {
     if (ticket.status === nextStatus) return;
+    if (!isValidStatusTransition(ticket.status, nextStatus)) return;
     setPendingChange({ ticket, nextStatus });
   };
 
@@ -167,11 +164,7 @@ export function IssueDashboard({
       ),
     );
 
-    setDetailTicket((curr) =>
-      curr && curr.id === ticket.id
-        ? { ...curr, status: nextStatus, updatedAt }
-        : curr,
-    );
+    setDetailTicket(null);
 
     toast.push(`Issue marked as ${STATUS_LABEL[nextStatus].toLowerCase()}`);
     setPendingChange(null);
@@ -221,7 +214,8 @@ export function IssueDashboard({
           tickets={filtered}
           onOpen={setDetailTicket}
           onStatusClick={(ticket) => {
-            handleStatusChange(ticket, STATUS_CYCLE[ticket.status]);
+            const next = getForwardStatus(ticket.status);
+            if (next) handleStatusChange(ticket, next);
           }}
         />
       </div>
