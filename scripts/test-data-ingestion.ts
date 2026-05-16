@@ -1,5 +1,5 @@
 import { DataIngestionService } from "../src/ingestion/dataIngestionService";
-import { MockXIngestor } from "../src/ingestion/X/mockXIngestor";
+import { MockXIngestor } from "../src/ingestion/x/mockXIngestor";
 
 async function main() {
   const service = new DataIngestionService({

@@ -28,17 +28,15 @@ export async function register() {
 
   // Dynamic imports keep this file from pulling Node-only modules into
   // the edge runtime's module graph during build analysis.
-  const { DataIngestionService } = await import(
-    "./src/ingestion/dataIngestionService"
-  );
-  const { MockXIngestor } = await import("./src/ingestion/X/mockXIngestor");
-  const { RedditIngestor } = await import(
-    "./src/ingestion/redditScrapper/redditIngestor"
-  );
+  const { DataIngestionService } = await import("./src/ingestion/dataIngestionService");
+  const { MockXIngestor } = await import("./src/ingestion/x/mockXIngestor");
+  const { RedditIngestor } = await import("./src/ingestion/redditScrapper/redditIngestor");
+  const { NewsIngestor } = await import("./src/ingestion/newsScraper/newsIngestor");
 
   const service = new DataIngestionService();
   service.register(new MockXIngestor());
   service.register(new RedditIngestor());
+  service.register(new NewsIngestor());
   await service.start();
 
   // Hand the timers back to the runtime cleanly on shutdown so a dev
@@ -48,5 +46,5 @@ export async function register() {
   process.once("SIGINT", stop);
   process.once("SIGTERM", stop);
 
-  console.log("[instrumentation] DataIngestionService started");
+  console.log("[instrumentation] DataIngestionService started (MockX + News)");
 }
