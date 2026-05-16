@@ -1,22 +1,23 @@
 import { Ingestor, type RawBatch } from "../ingestor";
 import {
-  fetchSubredditItems,
+  fetchAllCivicRedditItems,
   type RedditItem,
 } from "./redditScraper";
 
 // Reddit ingestor: hits Reddit's public JSON listings for the curated set of
-// subreddits, stages one raw file per subreddit so the LLM stage has clear
-// per-source attribution. Mirrors `MockXIngestor`'s structure so the
-// orchestrator can treat both sources identically.
+// civic-focused subreddits, stages one raw file per subreddit so the LLM stage
+// has clear per-source attribution. Uses keyword-based filtering to focus on
+// civic issues across multiple communities. Mirrors `NewsIngestor`'s structure
+// so the orchestrator can treat both sources identically.
 
-const DEFAULT_SUBREDDITS = ["Split", "croatia"] as const;
 // 30 min cadence is intentionally slower than the X mock (10 min) because
 // the public Reddit JSON endpoints are unauthenticated and aggressive in
 // rate-limiting; doubling the gap keeps a long demo session safe.
 const DEFAULT_INTERVAL_MS = 30 * 60 * 1000;
-// Tight per-subreddit cap because every kept post optionally fans out into
-// a comments fetch, and the rate-limiter serializes everything at 2s/req.
-const DEFAULT_LIMIT_PER_SUBREDDIT = 10;
+// Increased per-subreddit cap to get more civic issues across multiple
+// communities. The rate-limiter serializes everything at 2s/req, so this
+// will take ~2-3 min total per run across all subreddits.
+const DEFAULT_LIMIT_PER_SUBREDDIT = 25;
 
 const REDDIT_LLM_INSTRUCTIONS = `# Reddit ingestion — LLM stage instructions
 
@@ -85,7 +86,6 @@ numeric suffix.
 `;
 
 export interface RedditIngestorOptions {
-  subreddits?: readonly string[];
   rawDir?: string;
   intervalMs?: number;
   limitPerSubreddit?: number;
@@ -97,16 +97,12 @@ export class RedditIngestor extends Ingestor<RedditItem> {
   readonly dataSource = "reddit";
   readonly intervalMs: number;
   readonly llmInstructions = REDDIT_LLM_INSTRUCTIONS;
-  private readonly subreddits: readonly string[];
   private readonly limitPerSubreddit: number;
   private readonly includeComments: boolean;
   private readonly commentsPerPost: number;
 
   constructor(options: RedditIngestorOptions = {}) {
     super(options.rawDir);
-    this.subreddits = options.subreddits?.length
-      ? options.subreddits
-      : DEFAULT_SUBREDDITS;
     this.intervalMs = options.intervalMs ?? DEFAULT_INTERVAL_MS;
     this.limitPerSubreddit =
       options.limitPerSubreddit ?? DEFAULT_LIMIT_PER_SUBREDDIT;
@@ -115,27 +111,39 @@ export class RedditIngestor extends Ingestor<RedditItem> {
   }
 
   protected async fetchRaw(): Promise<RawBatch<RedditItem>[]> {
-    const batches: RawBatch<RedditItem>[] = [];
-    for (const subreddit of this.subreddits) {
-      try {
-        const items = await fetchSubredditItems(subreddit, {
-          limit: this.limitPerSubreddit,
-          includeComments: this.includeComments,
-          commentsPerPost: this.commentsPerPost,
-        });
-        if (items.length > 0) {
-          batches.push({ source: subreddit, items });
-        }
-      } catch (err) {
-        // One bad subreddit (rate limit, transient 5xx) shouldn't drop the
-        // others from this tick. The orchestrator will retry on next tick.
-        const error = err instanceof Error ? err : new Error(String(err));
-        console.warn(
-          `[ingest:reddit] r/${subreddit} fetch failed: ${error.message}`,
-        );
+    try {
+      const items = await fetchAllCivicRedditItems({
+        limit: this.limitPerSubreddit,
+        includeComments: this.includeComments,
+        commentsPerPost: this.commentsPerPost,
+      });
+
+      if (items.length === 0) {
+        return [];
       }
+
+      // Group items by subreddit for per-source attribution
+      const bySubreddit = new Map<string, RedditItem[]>();
+      for (const item of items) {
+        const key = item.subreddit;
+        if (!bySubreddit.has(key)) {
+          bySubreddit.set(key, []);
+        }
+        bySubreddit.get(key)!.push(item);
+      }
+
+      // Return one batch per subreddit
+      return Array.from(bySubreddit.entries()).map(([subreddit, subredditItems]) => ({
+        source: subreddit,
+        items: subredditItems,
+      }));
+    } catch (err) {
+      const error = err instanceof Error ? err : new Error(String(err));
+      console.error(
+        `[ingest:reddit] Failed to fetch civic Reddit items: ${error.message}`,
+      );
+      return [];
     }
-    return batches;
   }
 
   protected getDedupeId(item: RedditItem): string {
