@@ -5,6 +5,12 @@ import { Icon } from "../ui/Icon";
 import { Modal } from "../ui/Modal";
 import { STATUS_LABEL } from "./StatusBadge";
 import {
+  canReject,
+  FORWARD_ACTION,
+  getForwardStatus,
+  isTerminalStatus,
+} from "@/app/lib/issues/statusTransitions";
+import {
   getMetadata,
   type TicketObject,
   type TicketStatus,
@@ -28,17 +34,26 @@ export function IssueDetailModal({
   if (!ticket) return null;
   const meta = getMetadata(ticket);
 
-  const footer =
-    ticket.status === "pending_approval" ? (
-      <>
+  const forwardStatus = getForwardStatus(ticket.status);
+  const forwardAction = FORWARD_ACTION[ticket.status];
+
+  const footer = isTerminalStatus(ticket.status) ? (
+    <Button variant="outline" className="flex-1" onClick={onClose}>
+      Close
+    </Button>
+  ) : (
+    <>
+      {forwardStatus && forwardAction && (
         <Button
           variant="primary"
           className="flex-1"
-          leftIcon={<Icon name="check" size={16} />}
-          onClick={() => onChangeStatus(ticket, "open")}
+          leftIcon={<Icon name={forwardAction.icon} size={16} />}
+          onClick={() => onChangeStatus(ticket, forwardStatus)}
         >
-          Approve
+          {forwardAction.label}
         </Button>
+      )}
+      {canReject(ticket.status) && (
         <Button
           variant="danger"
           className="flex-1"
@@ -47,12 +62,9 @@ export function IssueDetailModal({
         >
           Reject
         </Button>
-      </>
-    ) : (
-      <Button variant="outline" className="flex-1" onClick={onClose}>
-        Close
-      </Button>
-    );
+      )}
+    </>
+  );
 
   return (
     <Modal
