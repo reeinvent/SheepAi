@@ -66,10 +66,10 @@ export function CommunityFeed({ initialTickets }: CommunityFeedProps) {
         },
       });
       setReportOpen(false);
-      toast.push("Thanks! Your report was submitted for review.");
+      toast.push("Hvala! Vaš izvještaj je poslan na pregled.");
     } catch (error) {
       console.error("Failed to submit report:", error);
-      toast.push("Couldn't submit your report. Please try again.");
+      toast.push("Nije moguće poslati vaš izvještaj. Molimo pokušajte ponovo.");
     }
   };
 
@@ -83,15 +83,15 @@ export function CommunityFeed({ initialTickets }: CommunityFeedProps) {
             className="inline-flex items-center justify-center gap-2 rounded-md text-sm font-semibold h-9 px-4 py-2 bg-white text-cyan-700 shadow-md hover:bg-cyan-50 transition-colors"
           >
             <Icon name="plus" size={16} />
-            Report an issue
+            Prijavi problem
           </button>
         }
       />
       <CommunityFilterBar filters={filters} onChange={setFilters} />
       {visible.length === 0 ? (
         <EmptyState
-          title="No issues found"
-          description="Try adjusting your filters"
+          title="Nema pronađenih problema"
+          description="Pokušajte prilagoditi filtre"
         />
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

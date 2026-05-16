@@ -18,11 +18,11 @@ const STAT_CONFIG: Array<{
   label: string;
   tone: StatTone;
 }> = [
-  { status: "pending_approval", label: "Pending", tone: "amber" },
-  { status: "open", label: "Open", tone: "blue" },
-  { status: "in_progress", label: "Active", tone: "indigo" },
-  { status: "resolved", label: "Resolved", tone: "emerald" },
-  { status: "rejected", label: "Rejected", tone: "red" },
+  { status: "pending_approval", label: "Na čekanju", tone: "amber" },
+  { status: "open", label: "Otvoreno", tone: "blue" },
+  { status: "in_progress", label: "Aktivno", tone: "indigo" },
+  { status: "resolved", label: "Riješeno", tone: "emerald" },
+  { status: "rejected", label: "Odbijeno", tone: "red" },
 ];
 
 export function IssueStats({

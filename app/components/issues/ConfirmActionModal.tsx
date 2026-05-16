@@ -47,7 +47,7 @@ export function ConfirmActionModal({
           onClick={onCancel}
           disabled={submitting}
         >
-          Cancel
+          Odustani
         </Button>
         <Button
           variant={action.variant}
@@ -55,7 +55,7 @@ export function ConfirmActionModal({
           onClick={handleConfirm}
           disabled={submitting}
         >
-          {submitting ? "Updating..." : action.label}
+          {submitting ? "Ažurira se..." : action.label}
         </Button>
       </div>
     </Modal>

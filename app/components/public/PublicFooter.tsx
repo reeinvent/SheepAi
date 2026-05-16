@@ -7,24 +7,24 @@ interface FooterLink {
 
 const SECTIONS: Array<{ title: string; links: FooterLink[] }> = [
   {
-    title: "Product",
+    title: "Proizvod",
     links: [
-      { label: "Articles", href: "#" },
-      { label: "Categories", href: "#" },
+      { label: "Članci", href: "#" },
+      { label: "Kategorije", href: "#" },
     ],
   },
   {
-    title: "Company",
+    title: "Tvrtka",
     links: [
-      { label: "About", href: "#" },
-      { label: "Contact", href: "#" },
+      { label: "O nama", href: "#" },
+      { label: "Kontakt", href: "#" },
     ],
   },
   {
-    title: "Legal",
+    title: "Pravno",
     links: [
-      { label: "Privacy", href: "#" },
-      { label: "Terms", href: "#" },
+      { label: "Privatnost", href: "#" },
+      { label: "Uvjeti korištenja", href: "#" },
     ],
   },
 ];
@@ -41,7 +41,7 @@ export function PublicFooter() {
             <span className="font-bold text-slate-800">Peristil</span>
           </div>
           <p className="text-slate-500 text-xs">
-            Community-powered issue reporting for Split.
+            Prijavljivanje gradskih problema uz podršku zajednice.
           </p>
         </div>
         {SECTIONS.map((section) => (
@@ -60,7 +60,7 @@ export function PublicFooter() {
         ))}
       </div>
       <div className="border-t border-slate-200 py-4 text-center text-xs text-slate-500">
-        © {year} Peristil. All rights reserved.
+        © {year} Peristil. Sva prava pridržana.
       </div>
     </footer>
   );

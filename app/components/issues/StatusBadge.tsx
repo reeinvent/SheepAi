@@ -19,11 +19,11 @@ const STATUS_ICON: Record<TicketStatus, IconName> = {
 };
 
 const STATUS_LABEL: Record<TicketStatus, string> = {
-  pending_approval: "Pending",
-  open: "Open",
-  in_progress: "In progress",
-  resolved: "Resolved",
-  rejected: "Rejected",
+  pending_approval: "Na čekanju",
+  open: "Otvoreno",
+  in_progress: "U tijeku",
+  resolved: "Riješeno",
+  rejected: "Odbijeno",
 };
 
 interface StatusBadgeProps {

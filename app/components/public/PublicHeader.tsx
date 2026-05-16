@@ -21,7 +21,7 @@ export function PublicHeader() {
         </Link>
         <button
           type="button"
-          aria-label="Sign in"
+          aria-label="Prijava"
           className="p-2 text-slate-600 hover:text-cyan-700 hover:bg-cyan-50 rounded-lg transition-colors"
         >
           <Icon name="user" size={20} />

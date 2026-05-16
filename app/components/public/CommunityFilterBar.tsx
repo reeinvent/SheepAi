@@ -17,12 +17,12 @@ export const EMPTY_COMMUNITY_FILTERS: CommunityFilters = {
 };
 
 const STATUS_OPTIONS: Array<{ value: IssueFilter; label: string }> = [
-  { value: "all", label: "All statuses" },
-  { value: "pending_approval", label: "Pending" },
-  { value: "open", label: "Open" },
-  { value: "in_progress", label: "In progress" },
-  { value: "resolved", label: "Resolved" },
-  { value: "rejected", label: "Rejected" },
+  { value: "all", label: "Svi statusi" },
+  { value: "pending_approval", label: "Na čekanju" },
+  { value: "open", label: "Otvoreno" },
+  { value: "in_progress", label: "U tijeku" },
+  { value: "resolved", label: "Riješeno" },
+  { value: "rejected", label: "Odbijeno" },
 ];
 
 interface CommunityFilterBarProps {
@@ -45,8 +45,8 @@ export function CommunityFilterBar({
         </div>
         <input
           type="search"
-          aria-label="Search issues"
-          placeholder="Search issues..."
+          aria-label="Pretraži probleme"
+          placeholder="Pretraži probleme..."
           value={filters.search}
           onChange={(e) => onChange({ ...filters, search: e.target.value })}
           className={`${controlClass} w-full pl-9`}
@@ -54,7 +54,7 @@ export function CommunityFilterBar({
       </div>
 
       <select
-        aria-label="Filter by status"
+        aria-label="Filtriraj po statusu"
         value={filters.status}
         onChange={(e) =>
           onChange({ ...filters, status: e.target.value as IssueFilter })

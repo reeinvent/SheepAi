@@ -8,9 +8,9 @@ interface CommunityHeroProps {
 }
 
 export function CommunityHero({
-  title = "Issues that matter to your city",
-  description = "Browse community-reported issues and show your support.",
-  badge = "Community board",
+  title = "Problemi koji su važni za vaš grad",
+  description = "Pregledajte probleme prijavljene od strane zajednice i pokažite svoju podršku.",
+  badge = "Oglasna ploča zajednice",
   action,
 }: CommunityHeroProps) {
   return (

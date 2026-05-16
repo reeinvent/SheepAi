@@ -7,10 +7,16 @@ const PRIORITY_TONE: Record<IssuePriority, BadgeTone> = {
   High: "red",
 };
 
+const PRIORITY_LABEL: Record<IssuePriority, string> = {
+  Low: "Nisko",
+  Medium: "Srednje",
+  High: "Visoko",
+};
+
 interface PriorityBadgeProps {
   priority: IssuePriority;
 }
 
 export function PriorityBadge({ priority }: PriorityBadgeProps) {
-  return <Badge tone={PRIORITY_TONE[priority]}>{priority}</Badge>;
+  return <Badge tone={PRIORITY_TONE[priority]}>{PRIORITY_LABEL[priority]}</Badge>;
 }

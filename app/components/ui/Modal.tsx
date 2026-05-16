@@ -66,7 +66,7 @@ export function Modal({
             <button
               type="button"
               onClick={onClose}
-              aria-label="Close"
+              aria-label="Zatvori"
               className="p-2 hover:bg-slate-100 rounded-lg text-slate-500 hover:text-slate-700"
             >
               <Icon name="x" size={20} />

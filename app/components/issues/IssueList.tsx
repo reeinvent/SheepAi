@@ -17,8 +17,8 @@ export function IssueList({ tickets, onOpen, onStatusClick }: IssueListProps) {
   if (tickets.length === 0) {
     return (
       <EmptyState
-        title="No issues found"
-        description="Try adjusting your filters"
+        title="Nema pronađenih problema"
+        description="Pokušajte prilagoditi filtre"
       />
     );
   }

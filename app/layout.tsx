@@ -9,8 +9,8 @@ const dmSans = DM_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Peristil — Split City Issue Tracker",
-  description: "Community-powered issue reporting for the city of Split",
+  title: "Peristil — Pratilac gradskih problema Splita",
+  description: "Prijavljivanje gradskih problema uz podršku zajednice u Splitu",
 };
 
 export default function RootLayout({
@@ -19,7 +19,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${dmSans.variable} antialiased`}>
+    <html lang="hr" className={`${dmSans.variable} antialiased`}>
       <body className="font-sans text-slate-800">{children}</body>
     </html>
   );
