@@ -6,14 +6,8 @@ import {
   getMetadata,
   type TicketObject,
   type TicketStatus,
+  CATEGORY_LABEL,
 } from "@/app/lib/issues/types";
-
-const CATEGORY_LABEL: Record<string, string> = {
-  "CITY-ADMIN": "Gradska uprava",
-  ELECTRICITY: "Struja i rasvjeta",
-  SANITATION: "Čistoća i otpad",
-  WATERSUPPLY: "Vodoopskrba",
-};
 
 const STATUS_TONE: Record<TicketStatus, BadgeTone> = {
   pending_approval: "amber",
