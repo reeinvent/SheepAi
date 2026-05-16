@@ -11,6 +11,13 @@ export interface UpdateTicketInput {
   status?: TicketStatus;
   priority?: string;
   description?: string;
+  lat?: number | null;
+  lon?: number | null;
+  location?: string | null;
+  approvedBy?: string | null;
+  startedBy?: string | null;
+  resolvedBy?: string | null;
+  rejectedBy?: string | null;
 }
 
 export class TicketRepository {
@@ -75,6 +82,13 @@ export class TicketRepository {
         ...(input.status !== undefined && { status: input.status }),
         ...(input.priority !== undefined && { priority: input.priority }),
         ...(input.description !== undefined && { description: input.description }),
+        ...(input.lat !== undefined && { lat: input.lat }),
+        ...(input.lon !== undefined && { lon: input.lon }),
+        ...(input.location !== undefined && { location: input.location }),
+        ...(input.approvedBy !== undefined && { approvedBy: input.approvedBy }),
+        ...(input.startedBy !== undefined && { startedBy: input.startedBy }),
+        ...(input.resolvedBy !== undefined && { resolvedBy: input.resolvedBy }),
+        ...(input.rejectedBy !== undefined && { rejectedBy: input.rejectedBy }),
       },
       include: {
         rawOutputs: true,

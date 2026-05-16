@@ -13,6 +13,13 @@ export interface UpdateTicketInput {
   status?: TicketStatus;
   priority?: string;
   description?: string;
+  lat?: number | null;
+  lon?: number | null;
+  location?: string | null;
+  approvedBy?: string | null;
+  startedBy?: string | null;
+  resolvedBy?: string | null;
+  rejectedBy?: string | null;
 }
 
 /**

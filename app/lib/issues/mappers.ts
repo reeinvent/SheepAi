@@ -27,6 +27,10 @@ export function dbTicketToTicketObject(ticket: Ticket): TicketObject {
       lat: ticket.lat ?? undefined,
       lng: ticket.lon ?? undefined,
       location: ticket.location ?? undefined,
+      approvedBy: ticket.approvedBy ?? undefined,
+      startedBy: ticket.startedBy ?? undefined,
+      resolvedBy: ticket.resolvedBy ?? undefined,
+      rejectedBy: ticket.rejectedBy ?? undefined,
     },
   };
 }
