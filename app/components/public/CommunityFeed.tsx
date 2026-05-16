@@ -14,22 +14,17 @@ import {
   type CommunityFilters,
 } from "./CommunityFilterBar";
 import { CommunityTicketCard } from "./CommunityTicketCard";
+import { createOutput } from "@/app/lib/actions/rawOutputActions";
 import type { IssueDraft, TicketObject } from "@/app/lib/issues/types";
 
 interface CommunityFeedProps {
   initialTickets: TicketObject[];
 }
 
-function nextId(tickets: TicketObject[]): string {
-  const max = tickets.reduce((acc, t) => {
-    const n = Number.parseInt(t.id, 10);
-    return Number.isFinite(n) && n > acc ? n : acc;
-  }, 0);
-  return String(max + 1);
-}
+const USER_REPORT_SOURCE = "userInput";
 
 export function CommunityFeed({ initialTickets }: CommunityFeedProps) {
-  const [tickets, setTickets] = useState<TicketObject[]>(initialTickets);
+  const [tickets] = useState<TicketObject[]>(initialTickets);
   const [filters, setFilters] = useState<CommunityFilters>(
     EMPTY_COMMUNITY_FILTERS,
   );
@@ -60,19 +55,22 @@ export function CommunityFeed({ initialTickets }: CommunityFeedProps) {
   }, [tickets, filters]);
 
   const handleSubmit = async (draft: IssueDraft) => {
-    const now = new Date();
-    const newTicket: TicketObject = {
-      id: nextId(tickets),
-      title: draft.title,
-      body: draft.body,
-      createdAt: now,
-      updatedAt: now,
-      status: "pending_approval",
-      metadata: { ...draft.metadata },
-    };
-    setTickets((prev) => [newTicket, ...prev]);
-    setReportOpen(false);
-    toast.push("Thank you for reporting!");
+    try {
+      await createOutput({
+        dataSource: USER_REPORT_SOURCE,
+        summary: draft.title,
+        metadata: {
+          title: draft.title,
+          body: draft.body,
+          ...draft.metadata,
+        },
+      });
+      setReportOpen(false);
+      toast.push("Thanks! Your report was submitted for review.");
+    } catch (error) {
+      console.error("Failed to submit report:", error);
+      toast.push("Couldn't submit your report. Please try again.");
+    }
   };
 
   return (
