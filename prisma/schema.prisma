@@ -45,6 +45,8 @@ model Ticket {
   priority      String   @default("medium")
   // JSON array of: SANITATION | WATERSUPPLY | CITY-ADMIN | ELECTRICITY | UNCATEGORIZED
   categories    String
+  lat           Float?
+  lon           Float?
 
   // Relationship to RawIngestorOutput
   rawOutputs    RawIngestorOutput[]
