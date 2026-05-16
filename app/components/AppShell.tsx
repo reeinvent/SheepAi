@@ -8,6 +8,7 @@ import { ToastProvider } from "./ui/Toast";
 
 const DEFAULT_NAV: SidebarNavItem[] = [
   { label: "Dashboard", icon: "home", href: "/", active: true },
+  { label: "Community board", icon: "user", href: "/community" },
   { label: "Map", icon: "map", disabled: true },
   { label: "Analytics", icon: "bar-chart", disabled: true },
   { label: "Settings", icon: "settings", disabled: true },

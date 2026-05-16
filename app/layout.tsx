@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { DM_Sans } from "next/font/google";
-import { AppShell } from "./components/AppShell";
 import "./globals.css";
 
 const dmSans = DM_Sans({
@@ -10,8 +9,8 @@ const dmSans = DM_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "City Issue Tracker",
-  description: "Municipal Services Department dashboard",
+  title: "Beeeeee — City Issue Tracker",
+  description: "Community-powered city issue reporting",
 };
 
 export default function RootLayout({
@@ -21,9 +20,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${dmSans.variable} antialiased`}>
-      <body className="font-sans bg-slate-50 text-slate-800">
-        <AppShell>{children}</AppShell>
-      </body>
+      <body className="font-sans text-slate-800">{children}</body>
     </html>
   );
 }

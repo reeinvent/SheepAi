@@ -16,6 +16,7 @@ interface IssueReportModalProps {
   open: boolean;
   onClose: () => void;
   onSubmit: (draft: IssueDraft) => Promise<void> | void;
+  hidePriority?: boolean;
 }
 
 interface FormState {
@@ -38,6 +39,7 @@ export function IssueReportModal({
   open,
   onClose,
   onSubmit,
+  hidePriority = false,
 }: IssueReportModalProps) {
   const [form, setForm] = useState<FormState>(EMPTY);
   const [submitting, setSubmitting] = useState(false);
@@ -51,7 +53,7 @@ export function IssueReportModal({
         body: form.body,
         metadata: {
           category: form.category,
-          priority: form.priority,
+          ...(hidePriority ? {} : { priority: form.priority }),
           location: form.location,
         },
       });
@@ -81,7 +83,7 @@ export function IssueReportModal({
           />
         </Field>
 
-        <div className="grid grid-cols-2 gap-3">
+        {hidePriority ? (
           <Field label="Category" htmlFor="inp-category">
             <SelectInput
               id="inp-category"
@@ -101,26 +103,48 @@ export function IssueReportModal({
               ))}
             </SelectInput>
           </Field>
-          <Field label="Priority" htmlFor="inp-priority">
-            <SelectInput
-              id="inp-priority"
-              required
-              value={form.priority}
-              onChange={(e) =>
-                setForm((f) => ({
-                  ...f,
-                  priority: e.target.value as IssuePriority,
-                }))
-              }
-            >
-              {ISSUE_PRIORITIES.map((p) => (
-                <option key={p} value={p}>
-                  {p}
-                </option>
-              ))}
-            </SelectInput>
-          </Field>
-        </div>
+        ) : (
+          <div className="grid grid-cols-2 gap-3">
+            <Field label="Category" htmlFor="inp-category">
+              <SelectInput
+                id="inp-category"
+                required
+                value={form.category}
+                onChange={(e) =>
+                  setForm((f) => ({
+                    ...f,
+                    category: e.target.value as IssueCategory,
+                  }))
+                }
+              >
+                {ISSUE_CATEGORIES.map((c) => (
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
+                ))}
+              </SelectInput>
+            </Field>
+            <Field label="Priority" htmlFor="inp-priority">
+              <SelectInput
+                id="inp-priority"
+                required
+                value={form.priority}
+                onChange={(e) =>
+                  setForm((f) => ({
+                    ...f,
+                    priority: e.target.value as IssuePriority,
+                  }))
+                }
+              >
+                {ISSUE_PRIORITIES.map((p) => (
+                  <option key={p} value={p}>
+                    {p}
+                  </option>
+                ))}
+              </SelectInput>
+            </Field>
+          </div>
+        )}
 
         <Field label="Location" htmlFor="inp-location">
           <TextInput

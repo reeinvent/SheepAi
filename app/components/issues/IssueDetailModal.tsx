@@ -13,7 +13,7 @@ import {
 interface IssueDetailModalProps {
   ticket: TicketObject | null;
   onClose: () => void;
-  onChangeStatus: (ticket: TicketObject, status: TicketStatus) => void;
+  onChangeStatus?: (ticket: TicketObject, status: TicketStatus) => void;
 }
 
 function formatDate(d?: Date | string | null): string {
@@ -29,7 +29,7 @@ export function IssueDetailModal({
   const meta = getMetadata(ticket);
 
   const footer =
-    ticket.status === "pending_approval" ? (
+    onChangeStatus && ticket.status === "pending_approval" ? (
       <>
         <Button
           variant="primary"
