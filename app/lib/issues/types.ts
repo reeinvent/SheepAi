@@ -16,6 +16,8 @@ export interface IssueMetadata {
   category?: IssueCategory;
   priority?: IssuePriority;
   location?: string;
+  lat?: number;
+  lng?: number;
   approvedBy?: string;
   startedBy?: string;
   resolvedBy?: string;

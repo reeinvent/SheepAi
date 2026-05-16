@@ -32,10 +32,10 @@ const PRIORITY_BG: Record<IssuePriority, string> = {
 };
 
 const ACTOR_BG: Record<string, string> = {
-  "Approved by": "bg-slate-100",
-  "Started by": "bg-slate-100",
-  "Resolved by": "bg-slate-100",
-  "Rejected by": "bg-slate-100",
+  "Odobrio": "bg-slate-100",
+  "Pokrenuo": "bg-slate-100",
+  "Riješio": "bg-slate-100",
+  "Odbio": "bg-slate-100",
 };
 
 interface IssueDetailModalProps {
@@ -80,7 +80,7 @@ export function IssueDetailModal({
           leftIcon={<Icon name="x" size={16} />}
           onClick={() => onChangeStatus?.(ticket, "rejected")}
         >
-          Reject
+          Odbij
         </Button>
       )}
     </>
@@ -99,7 +99,18 @@ export function IssueDetailModal({
         meta.location ? (
           <span className="inline-flex items-center gap-1">
             <Icon name="map-pin" size={12} />
-            {meta.location}
+            {meta.lat != null && meta.lng != null ? (
+              <a
+                href={`https://www.google.com/maps?q=${meta.lat},${meta.lng}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline hover:text-emerald-600"
+              >
+                {meta.location}
+              </a>
+            ) : (
+              meta.location
+            )}
           </span>
         ) : undefined
       }
@@ -109,14 +120,14 @@ export function IssueDetailModal({
       <div className="space-y-4">
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           <DetailStat label="Status" value={STATUS_LABEL[ticket.status]} bg={STATUS_BG[ticket.status]} />
-          <DetailStat label="Priority" value={meta.priority ?? "—"} bg={meta.priority ? PRIORITY_BG[meta.priority] : undefined} />
-          <DetailStat label="Category" value={meta.category ?? "—"} />
-          <DetailStat label="Reported" value={formatDate(ticket.createdAt)} />
+          <DetailStat label="Prioritet" value={meta.priority ?? "—"} bg={meta.priority ? PRIORITY_BG[meta.priority] : undefined} />
+          <DetailStat label="Kategorija" value={meta.category ?? "—"} />
+          <DetailStat label="Prijavljeno" value={formatDate(ticket.createdAt)} />
         </div>
 
         <div className="border-t border-slate-200 pt-4">
           <h3 className="text-sm font-semibold text-slate-700 mb-2">
-            Description
+            Opis
           </h3>
           <p className="text-sm text-slate-600 leading-relaxed whitespace-pre-line">
             {ticket.body}
@@ -125,10 +136,10 @@ export function IssueDetailModal({
 
         {(meta.approvedBy || meta.startedBy || meta.resolvedBy || meta.rejectedBy) && (
           <div className="border-t border-slate-200 pt-4 space-y-1">
-            {meta.approvedBy && <ActorRow label="Approved by" name={meta.approvedBy} bg={ACTOR_BG["Approved by"]} />}
-            {meta.startedBy && <ActorRow label="Started by" name={meta.startedBy} bg={ACTOR_BG["Started by"]} />}
-            {meta.resolvedBy && <ActorRow label="Resolved by" name={meta.resolvedBy} bg={ACTOR_BG["Resolved by"]} />}
-            {meta.rejectedBy && <ActorRow label="Rejected by" name={meta.rejectedBy} bg={ACTOR_BG["Rejected by"]} />}
+            {meta.approvedBy && <ActorRow label="Odobrio" name={meta.approvedBy} bg={ACTOR_BG["Odobrio"]} />}
+            {meta.startedBy && <ActorRow label="Pokrenuo" name={meta.startedBy} bg={ACTOR_BG["Pokrenuo"]} />}
+            {meta.resolvedBy && <ActorRow label="Riješio" name={meta.resolvedBy} bg={ACTOR_BG["Riješio"]} />}
+            {meta.rejectedBy && <ActorRow label="Odbio" name={meta.rejectedBy} bg={ACTOR_BG["Odbio"]} />}
           </div>
         )}
       </div>

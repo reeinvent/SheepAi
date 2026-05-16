@@ -40,9 +40,7 @@ export function IssueCard({ ticket, onOpen, onStatusClick }: IssueCardProps) {
               <StatusBadge
                 status={ticket.status}
                 onClick={
-                  onStatusClick
-                    ? (e) => onStatusClick(ticket, e)
-                    : undefined
+                  onStatusClick ? (e) => onStatusClick(ticket, e) : undefined
                 }
               />
             </span>
@@ -50,8 +48,21 @@ export function IssueCard({ ticket, onOpen, onStatusClick }: IssueCardProps) {
           <p className="text-xs text-slate-500 mt-1 flex items-center gap-1 flex-wrap">
             <Icon name="map-pin" size={12} />
             <span>
-              {meta.location ?? "Unknown location"}
-              {meta.category ? ` · ${meta.category}` : ""} · Reported{" "}
+              {meta.lat != null && meta.lng != null ? (
+                <a
+                  href={`https://www.google.com/maps?q=${meta.lat},${meta.lng}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-stop-card-click
+                  className="underline hover:text-emerald-600"
+                >
+                  {meta.location ??
+                    `${meta.lat.toFixed(6)}, ${meta.lng.toFixed(6)}`}
+                </a>
+              ) : (
+                (meta.location ?? "Nepoznata lokacija")
+              )}
+              {meta.category ? ` · ${meta.category}` : ""} · Prijavljeno{" "}
               {formatDate(ticket.createdAt)}
             </span>
           </p>
