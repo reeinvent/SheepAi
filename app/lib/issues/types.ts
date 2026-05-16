@@ -16,6 +16,10 @@ export interface IssueMetadata {
   category?: IssueCategory;
   priority?: IssuePriority;
   location?: string;
+  approvedBy?: string;
+  startedBy?: string;
+  resolvedBy?: string;
+  rejectedBy?: string;
 }
 
 export function getMetadata(ticket: TicketObject): IssueMetadata {

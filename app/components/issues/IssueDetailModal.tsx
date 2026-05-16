@@ -12,9 +12,31 @@ import {
 } from "@/app/lib/issues/statusTransitions";
 import {
   getMetadata,
+  type IssuePriority,
   type TicketObject,
   type TicketStatus,
 } from "@/app/lib/issues/types";
+
+const STATUS_BG: Record<TicketStatus, string> = {
+  pending_approval: "bg-amber-100",
+  open: "bg-blue-100",
+  in_progress: "bg-indigo-100",
+  resolved: "bg-emerald-100",
+  rejected: "bg-red-100",
+};
+
+const PRIORITY_BG: Record<IssuePriority, string> = {
+  Low: "bg-green-100",
+  Medium: "bg-amber-100",
+  High: "bg-red-100",
+};
+
+const ACTOR_BG: Record<string, string> = {
+  "Approved by": "bg-slate-100",
+  "Started by": "bg-slate-100",
+  "Resolved by": "bg-slate-100",
+  "Rejected by": "bg-slate-100",
+};
 
 interface IssueDetailModalProps {
   ticket: TicketObject | null;
@@ -48,7 +70,7 @@ export function IssueDetailModal({
           variant="primary"
           className="flex-1"
           leftIcon={<Icon name={forwardAction.icon} size={16} />}
-          onClick={() => onChangeStatus(ticket, forwardStatus)}
+          onClick={() => onChangeStatus?.(ticket, forwardStatus)}
         >
           {forwardAction.label}
         </Button>
@@ -58,7 +80,7 @@ export function IssueDetailModal({
           variant="danger"
           className="flex-1"
           leftIcon={<Icon name="x" size={16} />}
-          onClick={() => onChangeStatus(ticket, "rejected")}
+          onClick={() => onChangeStatus?.(ticket, "rejected")}
         >
           Reject
         </Button>
@@ -84,8 +106,8 @@ export function IssueDetailModal({
     >
       <div className="space-y-4">
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <DetailStat label="Status" value={STATUS_LABEL[ticket.status]} />
-          <DetailStat label="Priority" value={meta.priority ?? "—"} />
+          <DetailStat label="Status" value={STATUS_LABEL[ticket.status]} bg={STATUS_BG[ticket.status]} />
+          <DetailStat label="Priority" value={meta.priority ?? "—"} bg={meta.priority ? PRIORITY_BG[meta.priority] : undefined} />
           <DetailStat label="Category" value={meta.category ?? "—"} />
           <DetailStat label="Reported" value={formatDate(ticket.createdAt)} />
         </div>
@@ -98,20 +120,40 @@ export function IssueDetailModal({
             {ticket.body}
           </p>
         </div>
+
+        {(meta.approvedBy || meta.startedBy || meta.resolvedBy || meta.rejectedBy) && (
+          <div className="border-t border-slate-200 pt-4 space-y-1">
+            {meta.approvedBy && <ActorRow label="Approved by" name={meta.approvedBy} bg={ACTOR_BG["Approved by"]} />}
+            {meta.startedBy && <ActorRow label="Started by" name={meta.startedBy} bg={ACTOR_BG["Started by"]} />}
+            {meta.resolvedBy && <ActorRow label="Resolved by" name={meta.resolvedBy} bg={ACTOR_BG["Resolved by"]} />}
+            {meta.rejectedBy && <ActorRow label="Rejected by" name={meta.rejectedBy} bg={ACTOR_BG["Rejected by"]} />}
+          </div>
+        )}
       </div>
     </Modal>
+  );
+}
+
+function ActorRow({ label, name, bg }: { label: string; name: string; bg?: string }) {
+  return (
+    <div className={`flex items-center justify-between text-sm rounded-md px-3 py-1.5 ${bg ?? "bg-slate-100"}`}>
+      <span className="font-medium text-slate-500">{label}</span>
+      <span className="text-slate-700">{name}</span>
+    </div>
   );
 }
 
 function DetailStat({
   label,
   value,
+  bg,
 }: {
   label: string;
   value: React.ReactNode;
+  bg?: string;
 }) {
   return (
-    <div className="bg-slate-50 rounded-lg p-3">
+    <div className={`rounded-lg p-3 ${bg ?? "bg-slate-50"}`}>
       <p className="text-xs font-medium text-slate-500 uppercase">{label}</p>
       <p className="text-sm font-semibold text-slate-800 mt-1">{value}</p>
     </div>
