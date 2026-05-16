@@ -11,6 +11,13 @@ export interface UpdateTicketInput {
   status?: TicketStatus;
   priority?: string;
   description?: string;
+  lat?: number | null;
+  lon?: number | null;
+  location?: string | null;
+  approvedBy?: string | null;
+  startedBy?: string | null;
+  resolvedBy?: string | null;
+  rejectedBy?: string | null;
 }
 
 export class TicketRepository {
@@ -57,6 +64,7 @@ export class TicketRepository {
         description: input.description,
         priority: input.priority || "medium",
         status: "pending_approval",
+        categories: "[]",
       },
       include: {
         rawOutputs: true,
@@ -71,9 +79,16 @@ export class TicketRepository {
     return prisma.ticket.update({
       where: { id },
       data: {
-        ...(input.status && { status: input.status }),
-        ...(input.priority && { priority: input.priority }),
-        ...(input.description && { description: input.description }),
+        ...(input.status !== undefined && { status: input.status }),
+        ...(input.priority !== undefined && { priority: input.priority }),
+        ...(input.description !== undefined && { description: input.description }),
+        ...(input.lat !== undefined && { lat: input.lat }),
+        ...(input.lon !== undefined && { lon: input.lon }),
+        ...(input.location !== undefined && { location: input.location }),
+        ...(input.approvedBy !== undefined && { approvedBy: input.approvedBy }),
+        ...(input.startedBy !== undefined && { startedBy: input.startedBy }),
+        ...(input.resolvedBy !== undefined && { resolvedBy: input.resolvedBy }),
+        ...(input.rejectedBy !== undefined && { rejectedBy: input.rejectedBy }),
       },
       include: {
         rawOutputs: true,
@@ -109,15 +124,15 @@ export class TicketRepository {
    * Get ticket statistics
    */
   static async getTicketStats() {
-    const tickets = await prisma.ticket.findMany();
-    return {
-      total: tickets.length,
-      pending_approval: tickets.filter((t) => t.status === "pending_approval")
-        .length,
-      open: tickets.filter((t) => t.status === "open").length,
-      in_progress: tickets.filter((t) => t.status === "in_progress").length,
-      resolved: tickets.filter((t) => t.status === "resolved").length,
-      rejected: tickets.filter((t) => t.status === "rejected").length,
-    };
+    const [total, pending_approval, open, in_progress, resolved, rejected] =
+      await Promise.all([
+        prisma.ticket.count(),
+        prisma.ticket.count({ where: { status: "pending_approval" } }),
+        prisma.ticket.count({ where: { status: "open" } }),
+        prisma.ticket.count({ where: { status: "in_progress" } }),
+        prisma.ticket.count({ where: { status: "resolved" } }),
+        prisma.ticket.count({ where: { status: "rejected" } }),
+      ]);
+    return { total, pending_approval, open, in_progress, resolved, rejected };
   }
 }

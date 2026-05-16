@@ -138,6 +138,7 @@ export class RawIngestorOutputRepository {
         description: ticketData.description,
         priority: ticketData.priority || "medium",
         status: "open",
+        categories: "[]",
       },
     });
 

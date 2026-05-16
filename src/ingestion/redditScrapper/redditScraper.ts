@@ -1,4 +1,4 @@
-import { CITY_KEYWORDS } from "../keywords";
+import { CITY_KEYWORDS, matchesCityKeyword, matchedKeywords } from "../keywords";
 import { cleanText, isValidText } from "@/src/utils/textCleaner";
 
 // Low-level Reddit fetch helpers + the source-specific raw item shape that
@@ -63,7 +63,18 @@ export interface RedditItem {
   permalink: string;
   url: string;
   comments: RedditCommentItem[];
+  matchedKeywords: string[];
 }
+
+// Subreddits to monitor for civic issues in Split, Croatia.
+// Mix of city-specific (r/Split) and broader Croatian communities where
+// civic issues are discussed.
+const CIVIC_SUBREDDITS = [
+  "Split",           // City-specific, curated
+  "Croatia",         // National, but includes Split issues
+  "CroatiaPersonal", // Personal stories, often civic complaints
+  "Dalmatia",        // Regional, includes Split area
+];
 
 // Reddit's public JSON endpoints are unauthenticated but rate-limited per IP.
 // One global gate keeps interleaved post/comment fetches from clustering and
@@ -139,8 +150,8 @@ function isRelevantToSplit(post: RawRedditPost): boolean {
   // subreddits we require at least one Croatian civic keyword to keep raw
   // staging from filling up with unrelated content.
   if (post.subreddit.toLowerCase() === "split") return true;
-  const text = `${post.title} ${post.selftext}`.toLowerCase();
-  return CITY_KEYWORDS.some((kw) => text.includes(kw.toLowerCase()));
+  const text = `${post.title} ${post.selftext}`;
+  return matchesCityKeyword(text);
 }
 
 function toIso(createdUtc: number): string {
@@ -168,6 +179,11 @@ function toRedditItem(post: RawRedditPost): RedditItem | null {
     })
     .filter((c): c is RedditCommentItem => c !== null);
 
+  // Collect all matched keywords from title and body
+  const titleKeywords = matchedKeywords(post.title);
+  const bodyKeywords = matchedKeywords(post.selftext);
+  const allKeywords = Array.from(new Set([...titleKeywords, ...bodyKeywords]));
+
   return {
     id: post.id,
     title: title || "(No title)",
@@ -179,6 +195,7 @@ function toRedditItem(post: RawRedditPost): RedditItem | null {
     permalink: `https://www.reddit.com${post.permalink}`,
     url: post.url,
     comments,
+    matchedKeywords: allKeywords,
   };
 }
 
@@ -208,4 +225,27 @@ export async function fetchSubredditItems(
   return kept
     .map((p) => toRedditItem(p))
     .filter((item): item is RedditItem => item !== null);
+}
+
+/**
+ * Fetch civic issues from all monitored subreddits.
+ * Aggregates posts from multiple communities and filters by civic keywords.
+ */
+export async function fetchAllCivicRedditItems(
+  options: FetchSubredditOptions,
+): Promise<RedditItem[]> {
+  const allItems: RedditItem[] = [];
+
+  for (const subreddit of CIVIC_SUBREDDITS) {
+    try {
+      console.log(`[Reddit] Fetching from r/${subreddit}...`);
+      const items = await fetchSubredditItems(subreddit, options);
+      console.log(`[Reddit] Got ${items.length} items from r/${subreddit}`);
+      allItems.push(...items);
+    } catch (error) {
+      console.error(`[Reddit] Error fetching r/${subreddit}:`, error);
+    }
+  }
+
+  return allItems;
 }
