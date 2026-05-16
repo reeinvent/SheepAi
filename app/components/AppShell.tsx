@@ -10,7 +10,6 @@ import { ToastProvider } from "./ui/Toast";
 const DEFAULT_NAV: SidebarNavItem[] = [
   { label: "Nadzorna ploča", icon: "home", href: "/", active: true },
   { label: "Oglasna ploča zajednice", icon: "user", href: "/community" },
-  { label: "Karta", icon: "map", disabled: true },
   { label: "Analitika", icon: "bar-chart", disabled: true },
   { label: "Postavke", icon: "settings", disabled: true },
 ];

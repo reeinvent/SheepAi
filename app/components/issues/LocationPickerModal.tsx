@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { Button } from "../ui/Button";
 import { Icon } from "../ui/Icon";
 import { Modal } from "../ui/Modal";
+import { loadGoogleMapsScript } from "@/app/lib/googleMapsLoader";
 
 interface LatLng {
   lat: number;
@@ -20,6 +21,9 @@ interface LocationPickerModalProps {
 declare global {
   interface Window {
     __mapsLoaded?: boolean;
+    google?: {
+      maps: any;
+    };
   }
 }
 
@@ -28,29 +32,6 @@ const MAP_ID = process.env.NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID ?? "DEMO_MAP_ID";
 
 const DEFAULT_CENTER: LatLng = { lat: 43.5081, lng: 16.4402 };
 
-function loadMapsScript(): Promise<void> {
-  if (typeof window === "undefined") return Promise.resolve();
-  if (window.__mapsLoaded) return Promise.resolve();
-  return new Promise((resolve, reject) => {
-    const existing = document.getElementById("google-maps-script");
-    if (existing) {
-      existing.addEventListener("load", () => resolve());
-      existing.addEventListener("error", reject);
-      return;
-    }
-    const script = document.createElement("script");
-    script.id = "google-maps-script";
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${API_KEY}&libraries=marker`;
-    script.async = true;
-    script.onload = () => {
-      window.__mapsLoaded = true;
-      resolve();
-    };
-    script.onerror = reject;
-    document.head.appendChild(script);
-  });
-}
-
 export function LocationPickerModal({
   open,
   onDismiss,
@@ -58,10 +39,8 @@ export function LocationPickerModal({
   onConfirm,
 }: LocationPickerModalProps) {
   const mapRef = useRef<HTMLDivElement>(null);
-  const mapInstanceRef = useRef<google.maps.Map | null>(null);
-  const markerRef = useRef<google.maps.marker.AdvancedMarkerElement | null>(
-    null,
-  );
+  const mapInstanceRef = useRef<any>(null);
+  const markerRef = useRef<any>(null);
   const [pin, setPin] = useState<LatLng | null>(null);
   const [address, setAddress] = useState<string>("");
   const [geocoding, setGeocoding] = useState(false);
@@ -75,7 +54,7 @@ export function LocationPickerModal({
     setLoading(true);
     setError(false);
 
-    loadMapsScript()
+    loadGoogleMapsScript()
       .then(() => setLoading(false))
       .catch(() => {
         setLoading(false);
@@ -86,7 +65,7 @@ export function LocationPickerModal({
   useEffect(() => {
     if (loading || error || !open || !mapRef.current) return;
 
-    const map = new window.google.maps.Map(mapRef.current, {
+    const map = new window.google!.maps.Map(mapRef.current, {
       center: DEFAULT_CENTER,
       zoom: 13,
       disableDefaultUI: true,
@@ -96,16 +75,16 @@ export function LocationPickerModal({
 
     mapInstanceRef.current = map;
 
-    const geocoder = new window.google.maps.Geocoder();
+    const geocoder = new window.google!.maps.Geocoder();
 
-    map.addListener("click", (e: google.maps.MapMouseEvent) => {
+    map.addListener("click", (e: any) => {
       if (!e.latLng) return;
       const coords = { lat: e.latLng.lat(), lng: e.latLng.lng() };
 
       if (markerRef.current) {
         markerRef.current.position = e.latLng;
       } else {
-        markerRef.current = new window.google.maps.marker.AdvancedMarkerElement(
+        markerRef.current = new window.google!.maps.marker.AdvancedMarkerElement(
           {
             position: e.latLng,
             map,
@@ -119,7 +98,7 @@ export function LocationPickerModal({
 
       geocoder.geocode(
         { location: e.latLng },
-        (results: google.maps.GeocoderResult[] | null) => {
+        (results: any[] | null) => {
           if (results?.[0]) setAddress(results[0].formatted_address);
           setGeocoding(false);
         },

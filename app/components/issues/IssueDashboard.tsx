@@ -15,6 +15,7 @@ import { IssueReportModal } from "./IssueReportModal";
 import { IssueStats } from "./IssueStats";
 import { LocationPickerModal } from "./LocationPickerModal";
 import { PageHeader } from "./PageHeader";
+import { TicketsMap } from "./TicketsMap";
 import { STATUS_LABEL } from "./StatusBadge";
 import {
   getForwardStatus,
@@ -88,6 +89,8 @@ const STATUS_ACTOR_KEY: Partial<Record<TicketStatus, keyof IssueMetadata>> = {
 };
 
 
+type ViewMode = "list" | "map";
+
 export function IssueDashboard({
   initialTickets,
   title = "Peristil",
@@ -98,6 +101,7 @@ export function IssueDashboard({
     from: null,
     to: null,
   });
+  const [viewMode, setViewMode] = useState<ViewMode>("list");
 
   const [reportOpen, setReportOpen] = useState(false);
   const [detailTicket, setDetailTicket] = useState<TicketObject | null>(null);
@@ -266,14 +270,47 @@ export function IssueDashboard({
           onFilterChange={setStatusFilter}
         />
 
-        <IssueList
-          tickets={filtered}
-          onOpen={setDetailTicket}
-          onStatusClick={(ticket) => {
-            const next = getForwardStatus(ticket.status);
-            if (next) handleStatusChange(ticket, next);
-          }}
-        />
+        {/* Tab Navigation */}
+        <div className="flex gap-2 mb-6 border-b border-slate-200">
+          <button
+            onClick={() => setViewMode("list")}
+            className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
+              viewMode === "list"
+                ? "text-slate-900 border-b-2 border-blue-500 -mb-px"
+                : "text-slate-500 hover:text-slate-700"
+            }`}
+          >
+            <Icon name="list" />
+            Lista
+          </button>
+          <button
+            onClick={() => setViewMode("map")}
+            className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
+              viewMode === "map"
+                ? "text-slate-900 border-b-2 border-blue-500 -mb-px"
+                : "text-slate-500 hover:text-slate-700"
+            }`}
+          >
+            <Icon name="map" />
+            Karta
+          </button>
+        </div>
+
+        {/* View Content */}
+        {viewMode === "list" ? (
+          <IssueList
+            tickets={filtered}
+            onOpen={setDetailTicket}
+            onStatusClick={(ticket) => {
+              const next = getForwardStatus(ticket.status);
+              if (next) handleStatusChange(ticket, next);
+            }}
+          />
+        ) : (
+          <div className="w-full h-96 bg-slate-50 rounded-lg overflow-hidden border border-slate-200">
+            <TicketsMap tickets={filtered} />
+          </div>
+        )}
       </div>
 
       <IssueReportModal

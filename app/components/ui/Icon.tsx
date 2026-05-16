@@ -14,6 +14,7 @@ export type IconName =
   | "menu"
   | "home"
   | "map"
+  | "list"
   | "settings"
   | "bar-chart"
   | "loader"
@@ -105,6 +106,16 @@ const PATHS: Record<IconName, React.ReactNode> = {
       <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21" />
       <line x1="9" x2="9" y1="3" y2="18" />
       <line x1="15" x2="15" y1="6" y2="21" />
+    </>
+  ),
+  list: (
+    <>
+      <line x1="8" x2="21" y1="6" y2="6" />
+      <line x1="8" x2="21" y1="12" y2="12" />
+      <line x1="8" x2="21" y1="18" y2="18" />
+      <line x1="3" x2="3.01" y1="6" y2="6" />
+      <line x1="3" x2="3.01" y1="12" y2="12" />
+      <line x1="3" x2="3.01" y1="18" y2="18" />
     </>
   ),
   settings: (
