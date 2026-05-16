@@ -32,9 +32,13 @@ export async function register() {
     "./src/ingestion/dataIngestionService"
   );
   const { MockXIngestor } = await import("./src/ingestion/X/mockXIngestor");
+  const { RedditIngestor } = await import(
+    "./src/ingestion/redditScrapper/redditIngestor"
+  );
 
   const service = new DataIngestionService();
   service.register(new MockXIngestor());
+  service.register(new RedditIngestor());
   await service.start();
 
   // Hand the timers back to the runtime cleanly on shutdown so a dev

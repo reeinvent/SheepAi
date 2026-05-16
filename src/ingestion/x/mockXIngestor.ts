@@ -138,6 +138,17 @@ export class MockXIngestor extends Ingestor<XPost> {
       items: buildMockPosts(tag, now),
     }));
   }
+
+  protected getDedupeId(item: XPost): string {
+    return item.id;
+  }
+
+  // Stub returns nothing so every item is treated as new; a real
+  // implementation will read from whatever persistence backs this
+  // ingestor's dedup memory (state file, DB, scan of raw folder...).
+  protected async getItemsByDedupeIdList(_ids: string[]): Promise<string[]> {
+    return [];
+  }
 }
 
 interface PostTemplate {

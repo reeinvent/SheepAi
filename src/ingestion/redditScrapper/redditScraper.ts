@@ -1,7 +1,12 @@
-import { CITY_KEYWORDS } from '../keywords';
-import { cleanText, isValidText } from '@/src/utils/textCleaner';
+import { CITY_KEYWORDS } from "../keywords";
+import { cleanText, isValidText } from "@/src/utils/textCleaner";
 
-interface RedditComment {
+// Low-level Reddit fetch helpers + the source-specific raw item shape that
+// `RedditIngestor` stages to `data/raw/reddit/`. Stays narrow on purpose:
+// network + light normalization only. Filtering, summarization, and ticket
+// shaping happen in the LLM and promoter stages downstream.
+
+interface RawRedditComment {
   id: string;
   body: string;
   author: string;
@@ -9,7 +14,7 @@ interface RedditComment {
   created_utc: number;
 }
 
-interface RedditPost {
+interface RawRedditPost {
   id: string;
   title: string;
   selftext: string;
@@ -19,72 +24,104 @@ interface RedditPost {
   permalink: string;
   subreddit: string;
   score: number;
-  comments?: RedditComment[];
+  comments?: RawRedditComment[];
 }
 
-// Cleaned data structure for LLM processing
-export interface CleanedPost {
-  title: string;
-  content: string;
-  comments: string[];
-  score: number;
-  timestamp: number;
-}
-
-interface RedditResponse {
+interface RedditListingResponse {
   data: {
-    children: Array<{
-      data: RedditPost;
-    }>;
+    children: Array<{ data: RawRedditPost }>;
     after: string | null;
     before: string | null;
   };
 }
 
-// Rate limiting helper
-let lastRequestTime = 0;
-const MIN_REQUEST_INTERVAL = 2000; // 2 seconds between requests
+interface RedditCommentChild {
+  kind: string;
+  data: RawRedditComment;
+}
 
-async function rateLimitedFetch(url: string, options: RequestInit = {}): Promise<Response> {
+// Source-specific raw item the LLM stage will read out of `data/raw/reddit/`.
+// Shape mirrors what's useful for civic-issue triage: identity, attribution,
+// engagement signal, locatable text, plus a permalink so we can deep-link
+// back to the original post from a ticket.
+export interface RedditCommentItem {
+  id: string;
+  author: string;
+  body: string;
+  score: number;
+  createdAt: string;
+}
+
+export interface RedditItem {
+  id: string;
+  title: string;
+  body: string;
+  author: string;
+  subreddit: string;
+  score: number;
+  createdAt: string;
+  permalink: string;
+  url: string;
+  comments: RedditCommentItem[];
+}
+
+// Reddit's public JSON endpoints are unauthenticated but rate-limited per IP.
+// One global gate keeps interleaved post/comment fetches from clustering and
+// tripping a 429.
+let lastRequestTime = 0;
+const MIN_REQUEST_INTERVAL_MS = 2000;
+
+async function rateLimitedFetch(
+  url: string,
+  options: RequestInit = {},
+): Promise<Response> {
   const now = Date.now();
-  const timeSinceLastRequest = now - lastRequestTime;
-  
-  if (timeSinceLastRequest < MIN_REQUEST_INTERVAL) {
-    await new Promise(resolve => 
-      setTimeout(resolve, MIN_REQUEST_INTERVAL - timeSinceLastRequest)
+  const elapsed = now - lastRequestTime;
+  if (elapsed < MIN_REQUEST_INTERVAL_MS) {
+    await new Promise((resolve) =>
+      setTimeout(resolve, MIN_REQUEST_INTERVAL_MS - elapsed),
     );
   }
-  
   lastRequestTime = Date.now();
   return fetch(url, options);
 }
 
-// Helper function to fetch comments for a post
+async function getSubredditPosts(
+  subreddit: string,
+  limit: number,
+): Promise<RawRedditPost[]> {
+  const url = `https://www.reddit.com/r/${subreddit}/hot.json?limit=${limit}`;
+  const response = await rateLimitedFetch(url, {
+    headers: { "User-Agent": "SheepAi/1.0" },
+  });
+  if (!response.ok) {
+    throw new Error(`Reddit API error: ${response.status}`);
+  }
+  const data = (await response.json()) as RedditListingResponse;
+  return data.data.children.map((child) => child.data);
+}
+
 async function fetchPostComments(
   subreddit: string,
   postId: string,
-  limit: number = 10
-): Promise<RedditComment[]> {
+  limit: number,
+): Promise<RawRedditComment[]> {
   const url = `https://www.reddit.com/r/${subreddit}/comments/${postId}.json?limit=${limit}&sort=top`;
-
   try {
     const response = await rateLimitedFetch(url, {
-      headers: {
-        'User-Agent': 'SheepAi/1.0',
-      },
+      headers: { "User-Agent": "SheepAi/1.0" },
     });
-
     if (!response.ok) {
       throw new Error(`Reddit API error: ${response.status}`);
     }
-
-    const data = await response.json();
-    // Comments are in the second element of the array
-    const commentsData = data[1]?.data?.children || [];
-    
-    return commentsData
-      .filter((child: any) => child.kind === 't1') // t1 = comment
-      .map((child: any) => ({
+    const data = (await response.json()) as [
+      unknown,
+      { data?: { children?: RedditCommentChild[] } },
+    ];
+    const children = data[1]?.data?.children ?? [];
+    return children
+      .filter((child) => child.kind === "t1")
+      .map((child) => ({
         id: child.data.id,
         body: child.data.body,
         author: child.data.author,
@@ -97,157 +134,78 @@ async function fetchPostComments(
   }
 }
 
-export async function searchReddit(
-  query: string,
-  subreddit?: string,
-  limit: number = 25
-): Promise<RedditPost[]> {
-  const baseUrl = subreddit
-    ? `https://www.reddit.com/r/${subreddit}/search.json`
-    : 'https://www.reddit.com/search.json';
-
-  const params = new URLSearchParams({
-    q: query,
-    restrict_sr: subreddit ? 'on' : 'off',
-    sort: 'relevance',
-    limit: limit.toString(),
-  });
-
-  const url = `${baseUrl}?${params.toString()}`;
-
-  try {
-    const response = await rateLimitedFetch(url, {
-      headers: {
-        'User-Agent': 'SheepAi/1.0',
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error(`Reddit API error: ${response.status}`);
-    }
-
-    const data: RedditResponse = await response.json();
-    return data.data.children.map((child) => child.data);
-  } catch (error) {
-    console.error('Error fetching from Reddit:', error);
-    throw error;
-  }
+function isRelevantToSplit(post: RawRedditPost): boolean {
+  // r/Split is curated enough that we accept everything; for broader
+  // subreddits we require at least one Croatian civic keyword to keep raw
+  // staging from filling up with unrelated content.
+  if (post.subreddit.toLowerCase() === "split") return true;
+  const text = `${post.title} ${post.selftext}`.toLowerCase();
+  return CITY_KEYWORDS.some((kw) => text.includes(kw.toLowerCase()));
 }
 
-export async function getSubredditPosts(
-  subreddit: string,
-  limit: number = 25
-): Promise<RedditPost[]> {
-  const url = `https://www.reddit.com/r/${subreddit}/hot.json?limit=${limit}`;
-
-  try {
-    const response = await rateLimitedFetch(url, {
-      headers: {
-        'User-Agent': 'SheepAi/1.0',
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error(`Reddit API error: ${response.status}`);
-    }
-
-    const data: RedditResponse = await response.json();
-    return data.data.children.map((child) => child.data);
-  } catch (error) {
-    console.error('Error fetching subreddit posts:', error);
-    throw error;
-  }
+function toIso(createdUtc: number): string {
+  return new Date(createdUtc * 1000).toISOString();
 }
 
-// Helper function to convert raw post to cleaned post for LLM
-function cleanPost(post: RedditPost): CleanedPost | null {
+function toRedditItem(post: RawRedditPost): RedditItem | null {
   const title = cleanText(post.title);
-  const content = cleanText(post.selftext);
-  
-  // Only include if there's meaningful content
-  if (!isValidText(title) && !isValidText(content)) {
-    return null;
-  }
-  
-  const comments = (post.comments || [])
-    .map(comment => cleanText(comment.body))
-    .filter(text => isValidText(text, 5)); // Minimum 5 chars for comments
-  
+  const body = cleanText(post.selftext);
+  // Keep posts whose title OR body has substance after stripping markdown
+  // and Reddit artifacts. Posts that collapse to nothing are pure link/meme.
+  if (!isValidText(title) && !isValidText(body)) return null;
+
+  const comments = (post.comments ?? [])
+    .map<RedditCommentItem | null>((c) => {
+      const cleaned = cleanText(c.body);
+      if (!isValidText(cleaned, 5)) return null;
+      return {
+        id: c.id,
+        author: c.author,
+        body: cleaned,
+        score: c.score,
+        createdAt: toIso(c.created_utc),
+      };
+    })
+    .filter((c): c is RedditCommentItem => c !== null);
+
   return {
-    title: title || '(No title)',
-    content: content || '(No content)',
-    comments,
+    id: post.id,
+    title: title || "(No title)",
+    body,
+    author: post.author,
+    subreddit: post.subreddit,
     score: post.score,
-    timestamp: post.created_utc,
+    createdAt: toIso(post.created_utc),
+    permalink: `https://www.reddit.com${post.permalink}`,
+    url: post.url,
+    comments,
   };
 }
 
-// Helper function to filter out irrelevant posts using Croatian keywords
-function isRelevantToSplit(post: RedditPost): boolean {
-  const text = `${post.title} ${post.selftext}`.toLowerCase();
-  
-  // Check if post contains at least one Croatian city keyword
-  const hasLocalKeyword = CITY_KEYWORDS.some(keyword => 
-    text.includes(keyword.toLowerCase())
-  );
-  
-  // Also accept posts from r/Split subreddit directly
-  const isFromSplitSub = post.subreddit.toLowerCase() === 'split';
-  
-  return hasLocalKeyword || isFromSplitSub;
+export interface FetchSubredditOptions {
+  limit: number;
+  includeComments: boolean;
+  commentsPerPost?: number;
 }
 
-// Helper function to search for Split, Croatia specific info
-export async function searchSplitCroatia(limit: number = 25, includeComments: boolean = true): Promise<CleanedPost[]> {
-  const allPosts: RedditPost[] = [];
-  const seenIds = new Set<string>();
+export async function fetchSubredditItems(
+  subreddit: string,
+  options: FetchSubredditOptions,
+): Promise<RedditItem[]> {
+  const posts = await getSubredditPosts(subreddit, options.limit);
+  const kept = posts.filter(isRelevantToSplit);
 
-  // Primary source: r/Split subreddit directly
-  try {
-    const splitSubPosts = await getSubredditPosts('Split', limit);
-    for (const post of splitSubPosts) {
-      if (!seenIds.has(post.id) && isRelevantToSplit(post)) {
-        seenIds.add(post.id);
-        
-        // Fetch comments if requested
-        if (includeComments) {
-          post.comments = await fetchPostComments(post.subreddit, post.id, 5);
-        }
-        
-        allPosts.push(post);
-      }
-    }
-  } catch (error) {
-    console.error('Error fetching from r/Split:', error);
-  }
-
-  // If we don't have enough posts, try r/croatia
-  if (allPosts.length < limit) {
-    try {
-      const croatiaPosts = await getSubredditPosts('croatia', Math.ceil(limit / 2));
-      for (const post of croatiaPosts) {
-        if (!seenIds.has(post.id) && isRelevantToSplit(post)) {
-          seenIds.add(post.id);
-          
-          // Fetch comments if requested
-          if (includeComments) {
-            post.comments = await fetchPostComments(post.subreddit, post.id, 5);
-          }
-          
-          allPosts.push(post);
-        }
-      }
-    } catch (error) {
-      console.error('Error fetching from r/croatia:', error);
+  if (options.includeComments) {
+    for (const post of kept) {
+      post.comments = await fetchPostComments(
+        post.subreddit,
+        post.id,
+        options.commentsPerPost ?? 5,
+      );
     }
   }
 
-  // Convert to cleaned posts and filter out empty ones
-  const cleanedPosts = allPosts
-    .map(post => cleanPost(post))
-    .filter((post): post is CleanedPost => post !== null)
-    .sort((a, b) => b.score - a.score)
-    .slice(0, limit);
-
-  return cleanedPosts;
+  return kept
+    .map((p) => toRedditItem(p))
+    .filter((item): item is RedditItem => item !== null);
 }

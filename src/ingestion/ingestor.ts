@@ -114,10 +114,23 @@ export abstract class Ingestor<TRaw = unknown> {
   // so the LLM job can group or filter by it.
   protected abstract fetchRaw(): Promise<RawBatch<TRaw>[]>;
 
+  // Extract the dedup id from a raw item. The base calls this on every
+  // fetched item before writing to disk so it can ask the subclass which
+  // ids have already been staged. Must be stable for the same upstream
+  // item across runs — typically the source's native id (tweet id,
+  // reddit post id, ...).
+  protected abstract getDedupeId(item: TRaw): string;
+
+  // Given the dedup ids of items the current run wants to stage, return
+  // the subset that have ALREADY been staged by previous runs. Those will
+  // be filtered out before writing, so a re-fetched post doesn't end up
+  // in the raw folder twice. Return an empty array to disable dedup.
+  protected abstract getItemsByDedupeIdList(ids: string[]): Promise<string[]>;
+
   // Run the fetch + stage cycle once. Returns the list of staged file
   // paths so a cron orchestrator can log them or hand them off.
   async run(): Promise<string[]> {
-    const batches = await this.fetchRaw();
+    const batches = await this.dropDuplicates(await this.fetchRaw());
     const fetchedAt = new Date().toISOString();
     const dir = join(this.rawDir, this.dataSource);
     await mkdir(dir, { recursive: true });
@@ -136,6 +149,26 @@ export abstract class Ingestor<TRaw = unknown> {
       paths.push(path);
     }
     return paths;
+  }
+
+  // Ask the subclass which ids are already on disk, then strip those
+  // items out of every batch. Empty batches are dropped entirely so the
+  // staging step doesn't emit zero-item files.
+  private async dropDuplicates(
+    batches: RawBatch<TRaw>[],
+  ): Promise<RawBatch<TRaw>[]> {
+    const allIds = batches.flatMap((b) =>
+      b.items.map((i) => this.getDedupeId(i)),
+    );
+    if (allIds.length === 0) return batches;
+    const dupes = new Set(await this.getItemsByDedupeIdList(allIds));
+    if (dupes.size === 0) return batches;
+    return batches
+      .map((b) => ({
+        source: b.source,
+        items: b.items.filter((i) => !dupes.has(this.getDedupeId(i))),
+      }))
+      .filter((b) => b.items.length > 0);
   }
 }
 
